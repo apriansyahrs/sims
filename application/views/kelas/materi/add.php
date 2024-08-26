@@ -126,6 +126,10 @@ $max_size = 2048; // KB
                                    value="<?= $materi->judul_materi ?>" placeholder="Judul materi" required>
                         </div>
                         <div class="col-12 mb-3">
+                            <label>Jurnal <?= $judul ?></label>
+                            <input type="text" class="form-control" name="jurnal" value="<?= $materi->kode_mapel ?>" placeholder="Jurnal materi" required>
+                        </div>
+                        <div class="col-12 mb-3">
                             <label>Isi <?= $judul ?></label>
                             <textarea id="text-materi" name='isi_materi' class='editor'
                                       spellcheck="false" autocomplete="off"
