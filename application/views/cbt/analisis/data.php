@@ -15,6 +15,21 @@
             <div class="card card-default my-shadow mb-4">
                 <div class="card-header">
                     <h6 class="card-title"><?= $subjudul ?></h6>
+                    <div class="card-tools">
+                        <a href="<?= base_url('kelasmateri/' . $urlJenis . '?id=' . $id_guru) ?>" type="button"
+                            onclick=""
+                            class="btn btn-sm btn-default">
+                            <i class="fa fa-sync"></i> <span class="d-none d-sm-inline-block ml-1">Reload</span>
+                        </a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="tooltip" title="Print" onclick="printTable()">
+                                <i class="fas fa-print"></i> <span class="d-none d-sm-inline-block ml-1"> Print/PDF</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="tooltip" title="Export As Word" onclick="exportWord()">
+                                <i class="fa fa-file-word"></i> <span class="d-none d-sm-inline-block ml-1"> Word</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
@@ -78,7 +93,7 @@
                         //var_dump($soals);
                         //echo '</pre>';
                         if (isset($soals[1])) :?>
-                            <div class="card card-success col-md-12 p-0">
+                            <div class="card card-success col-md-12 p-0" id="preview">
                                 <div class="card-header">
                                     <h3 class="card-title">Soal Pilihan Ganda</h3>
 
@@ -301,7 +316,14 @@
     </section>
 </div>
 
+<script src="<?= base_url() ?>/assets/app/js/print-area.js"></script>
+<script type="text/javascript" src="<?= base_url() ?>/assets/app/js/convertCss.js"></script>
+<script type="text/javascript" src="<?= base_url() ?>/assets/app/js/html-docx.js"></script>
+<script src="<?= base_url() ?>/assets/app/js/convert-area.js"></script>
+<script type="text/javascript" src="<?= base_url() ?>/assets/app/js/FileSaver.min.js"></script>
+
 <script>
+    var docTitle = '';
     var idJadwal = '<?=$jadwal_selected?>';
     var isSelected = <?= $jadwal_selected == null ? 0 : 1?>;
 
@@ -448,4 +470,60 @@
         });
         */
     });
+
+        // Report
+        function cloneTable() {
+        // Clone the #preview element
+        var html = $('#preview').clone();
+
+        // Remove elements with the class 'hidden'
+        html.find('.hidden').remove();
+
+        html.find('button').remove();
+
+        // Remove all classes and apply consistent styling to table, thead, th, and td elements
+        html.find('table, thead, th, td').removeAttr('class').css({
+            'border': '1px solid #c0c0c0',
+            'border-collapse': 'collapse',
+            'text-align': 'center',
+            'vertical-align': 'middle',
+            'padding': '5px' // Ensure proper spacing within table cells
+        });
+
+        // Apply background color to the table headers (th elements)
+        html.find('th').css('background-color', 'lightgrey');
+
+        // Wrap the content of each th and td in a paragraph with specific styling
+        html.find('th, td').each(function() {
+            var content = $(this).html(); // Preserve the existing HTML content
+            $(this).html('<p style="margin: 1px 4px; display: inline;">' + content + '</p>');
+        });
+
+        return html; // Return the cleaned and styled HTML
+    }
+
+    function printTable() {
+        var title = document.title;
+        document.title = docTitle;
+        var html = cloneTable();
+        html.print();
+        document.title = title;
+    }
+
+    function exportWord() {
+        var contentDocument = cloneTable().convertToHtmlFile(docTitle, '');
+        var content = '<!DOCTYPE html>' + contentDocument.documentElement.outerHTML;
+        //console.log('css', content);
+        var converted = htmlDocx.asBlob(content, {
+            orientation: 'landscape',
+            size: 'A4',
+            margins: {
+                top: 700,
+                bottom: 700,
+                left: 1000,
+                right: 1000
+            }
+        });
+        saveAs(converted, docTitle + '.docx');
+    }   
 </script>

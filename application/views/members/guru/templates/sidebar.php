@@ -84,13 +84,13 @@
                                 <p>Tugas</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="<?= base_url('kelasmaterijadwal') ?>"
                                class="nav-link <?= $page === 'kelasmaterijadwal' ? "active" : "" ?>">
                                 <i class="fa fa-calendar-alt nav-icon"></i>
                                 <p>Jadwal Materi/Tugas</p>
                             </a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a href="<?= base_url('kelasstatus') ?>"
                                class="nav-link <?= $page === 'kelasstatus' ? "active" : "" ?>">

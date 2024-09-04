@@ -253,7 +253,7 @@ $tempIdSelected = $id_kelas . $tp_active->id_tp . $smt_active->id_smt;
                                         $jamke = $i + 1; ?>
                                         <tr>
                                             <td class="text-center align-middle text-bold tanggal">
-                                                <?= buat_tanggal(date('D, d M Y', strtotime($jh))) ?>
+                                                <?= buat_tanggal(date('D, d M', strtotime($jh))) ?>
                                             </td>
                                             <td class="border text-center align-middle jam-ke"
                                                 data-tgl="<?= $jh ?>"><?= $jamke ?></td>

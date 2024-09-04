@@ -90,6 +90,7 @@
                                 <th class="text-center align-middle p-0 w-auto">No.Urut Rapor</th>
                                 <th class="text-center">Mata Pelajaran</th>
                                 <th class="text-center">Kode Mata Pelajaran</th>
+                                <th class="text-center">Durasi</th>
                                 <th class="text-center">Kelompok</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center align-middle p-0"><span>Aksi</span></th>
@@ -229,6 +230,24 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Durasi*</label>
+                    <div class="col-md-10">
+                            <?php
+                            $menits[''] = 'Durasi mapel';
+                            $menit = 20;
+                            for ($i = 0; $i < 9; $i++) {
+                                $menits[$menit] = $menit . ' menit';
+                                $menit += 5;
+                            }
+                            echo form_dropdown(
+                                'durasi_mapel',
+                                $menits,
+                                $durasi_mapel,
+                                'id="durasi_mapel" class="form-control" required'
+                            ); ?>
+                    </div>
+                </div>
+                <div class="form-group row">
                     <label class="col-md-2 col-form-label">Kelompok*</label>
                     <div class="col-md-10">
                         <?php echo form_dropdown(
@@ -291,6 +310,24 @@
                     <label class="col-md-2 col-form-label">Kode*</label>
                     <div class="col-md-10">
                         <input type="text" id="kodeEdit" name="kode_mapel" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2 col-form-label">Durasi*</label>
+                    <div class="col-md-10">
+                            <?php
+                            $menits[''] = 'Durasi mapel';
+                            $menit = 20;
+                            for ($i = 0; $i < 9; $i++) {
+                                $menits[$menit] = $menit . ' menit';
+                                $menit += 5;
+                            }
+                            echo form_dropdown(
+                                'durasi_mapel',
+                                $menits,
+                                '',
+                                'id="durasi" class="form-control" required'
+                            ); ?>
                     </div>
                 </div>
                 <div class="form-group row" id="formkelompok">

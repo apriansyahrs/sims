@@ -75,6 +75,8 @@ $(document).ready(function () {
         },
     });
 
+
+
     tableSubKelompok = $("#tableSubKelompok").DataTable({
         initComplete: function () {
             var api = this.api();
@@ -146,7 +148,7 @@ $(document).ready(function () {
         },
     });
 
-    var groupColumn = 4;
+    var groupColumn = 5;
 	table = $("#tableMapel").DataTable({
 		initComplete: function () {
 			var api = this.api();
@@ -189,6 +191,17 @@ $(document).ready(function () {
 				data: "kode",
                 className: "text-center",
 			},
+			{
+				data: "durasi_mapel",
+                className: "text-center",
+                render: function (data, type, row) {
+                    // Pastikan data berupa angka
+                    var durasi = parseInt(data);
+
+                    // Tambahkan " menit" ke data durasi_mapel
+                    return durasi + " menit";
+                }
+			},
             {
                 data: "kelompok",
                 className: "text-center",
@@ -213,7 +226,7 @@ $(document).ready(function () {
 			},
 			{
 				searchable: false,
-				targets: 6,
+				targets: 7,
 				data: {
 					id_mapel: "id_mapel",
 					nama_mapel: "nama_mapel",
@@ -229,7 +242,7 @@ $(document).ready(function () {
                     return `<div class="text-center">
 									<a class="btn btn-xs btn-warning" data-toggle="modal" data-target="#editMapelModal"
 									 data-deletable="${data.deletable}" data-status="${data.status}" data-id="${data.id_mapel}"
-									  data-nama="${data.nama_mapel}" data-kode="${data.kode}" data-kelompok="${data.kelompok}"
+									  data-nama="${data.nama_mapel}" data-kode="${data.kode}" data-kelompok="${data.kelompok}" data-durasi="${data.durasi_mapel}"
 									   data-urutan="${data.urutan_tampil}">
 										<i class="fa fa-pencil-alt text-white"></i>
 									</a>
@@ -255,7 +268,7 @@ $(document).ready(function () {
 			api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
 				if ( last !== group ) {
 					$(rows).eq( i ).before(
-						'<tr class="group bg-gray"><td class="pl-2 text-bold" colspan="7">'+group+'</td></tr>'
+						'<tr class="group bg-gray"><td class="pl-2 text-bold" colspan="8">'+group+'</td></tr>'
 					);
 					last = group;
 				}
@@ -271,7 +284,7 @@ $(document).ready(function () {
 			var st = data.status === '0' ?
 				'<div class="badge badge-btn badge-secondary">Nonaktif</div>' :
 				'<div class="badge badge-btn badge-success">Aktif</div>';
-            $("td:eq(5)", row).html(st);
+            $("td:eq(6)", row).html(st);
 		}
 	});
 
@@ -454,14 +467,18 @@ $(document).ready(function () {
 		var nama = $(e.relatedTarget).data('nama');
 		var kode = $(e.relatedTarget).data('kode');
         var kelompok = $(e.relatedTarget).data('kelompok');
+        var durasi = $(e.relatedTarget).data('durasi');
         var status = $(e.relatedTarget).data('status');
         var deletable = $(e.relatedTarget).data('deletable');
         var urut = $(e.relatedTarget).data('urutan');
+
+        console.log(durasi);
 
         $('#namaEdit').val(nama);
         $('#kodeEdit').val(kode);
         $('#editIdMapel').val(id);
 		$('#kelompok').val(kelompok);
+		$('#durasi').val(durasi);
         $('#status').val(status);
         $('#kodeUrut').val(urut);
 
