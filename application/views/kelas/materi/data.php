@@ -171,7 +171,7 @@ foreach ($materi as $k => $m) {
                                                             $len = $sisa === 3 ? 2 : 1;
                                                             $jam = substr($jtgl->id_kjm, strlen($jtgl->id_kjm ?? '') - $sisa, $len);
                                                             $ctgl = singkat_tanggal(date('d M Y', strtotime($jtgl->jadwal_materi)));
-                                                            $arrtgl .= '<div class="m-1"><span class="bg-circle bg-gray-light border text-sm">' . $ctgl . ' jam:' . $jam
+                                                            $arrtgl .= '<div class="m-1"><span class="bg-circle bg-gray-light border text-sm">Jurnal: ' . $jtgl->jurnal . ' - Tanggal: ' . $ctgl . ' jam: ' . $jam
                                                                 . '<button class="btn btn-sm" data-tgl="' . $ctgl . '" data-id="' . $jtgl->id_kjm . '" onclick="hapusTgl(this)" ' . $disabledBtn
                                                                 . '><i class="fa fa-times-circle-o"></i></button></span></div>';
                                                         }
@@ -376,13 +376,17 @@ foreach ($materi as $k => $m) {
                     <input class="d-none" type="text" name="id_materi" value="">
                     <input class="d-none" type="text" name="id_mapel" value="">
                     <input class="d-none" type="text" name="jadwal_materi" value="">
-                    <div class="row align-items-center">
+                    <div class="row align-items-center mb-3">
                         <span class="col-3 text-bold">Jam Ke:</span>
                         <select id="jam-ke" name="jam_ke" class="form-control col-6" required="">
                             <option>
                                 Pilih tanggal dulu
                             </option>
                         </select>
+                    </div>
+                    <div class="row align-items-center">
+                        <span class="col-3 text-bold">Jurnal</span>
+                        <input type="text" name="jurnal" class="form-control col-6" required="">
                     </div>
                 </div>
                 <?= form_close() ?>

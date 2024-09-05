@@ -138,6 +138,10 @@
                                 <td class="text-bold">Sampai</td>
                                 <td id="info-sampai">....</td>
                             </tr>
+                            <tr>
+                                <td class="text-bold">Jurnal</td>
+                                <td id="info-jurnal">....</td>
+                            </tr>
                         </table>
                     </div>
                     <hr>
@@ -370,6 +374,19 @@
             $('#nilai').val(nilaiHasil);
             $('#catatan').html(catatanGuru);
 
+            // Tambahkan tombol "Lihat Tugas" untuk link
+            $('#konten-hasil').find('p').each(function() {
+                var text = $(this).text();
+                
+                if (text.includes('http') || text.includes('https') || text.includes('www')) {
+                    var link = text.trim();
+                    var button = '<button class="btn btn-sm btn-info" onclick="window.open(\'' + link + '\', \'_blank\')">Lihat Tugas</button>';
+                    // Cek apakah tombol sudah ada
+                    if (!$(this).next().is('button')) {
+                        $(this).before(button);
+                    }
+                }
+            });
         });
 
         $('#formnilai').submit('click', function (e) {
@@ -499,6 +516,7 @@
                     $('#info-jam').text(data.detail.jam_ke || '-')
                     $('#info-dari').text(data.detail.waktu.dari || '-')
                     $('#info-sampai').text(data.detail.waktu.sampai || '-')
+                    $('#info-jurnal').text(data.detail.jurnal || '-')
 
                     resultAll = data.log;
                     var table = $('#log');
