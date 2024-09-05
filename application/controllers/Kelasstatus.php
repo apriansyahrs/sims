@@ -267,6 +267,7 @@ class Kelasstatus extends MY_Controller {
             $detail = [
                 "mapel" => $materi->nama_mapel,
                 "judul" => $materi->judul_materi,
+                "jurnal" => $materi->jurnal,
                 "guru" => $materi->nama_guru,
                 "kelas" => $kelas_materi[$id_kelas],
                 "jam_ke"=> $jadwal->jam_ke,
