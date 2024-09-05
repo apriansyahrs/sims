@@ -94,12 +94,12 @@
                                 <p>Guru</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="<?= base_url('datadokumen') ?>" class="nav-link <?= $page === 'datadokumen' ? "active" : "" ?>">
                                 <i class="fa fa-folder-open nav-icon"></i>
                                 <p>Dokumen <div class="badge badge-sm badge-danger ml-1">Baru</div></p>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </li>
                 <li class="nav-item has-treeview <?= in_array($page, $elearning) ? "menu-open" : "" ?>">
