@@ -406,6 +406,7 @@ class Kelasmateri extends MY_Controller {
         $jenis = $this->input->post('jenis',true);
         $jam_ke = $this->input->post('jam_ke',true);
         $jurnal = $this->input->post('jurnal',true);
+        $link_file = $this->input->post('link_file',true);
 		$jadwal = $this->input->post('jadwal_materi', true);
 
 		$tp = $this->dashboard->getTahunActive();
@@ -422,6 +423,7 @@ class Kelasmateri extends MY_Controller {
 			'id_mapel' => $id_mapel,
 			'jadwal_materi' => $jadwal,
 			'jurnal' => $jurnal,
+			'link_file' => $link_file,
             'jenis' => $jenis
 		];
 

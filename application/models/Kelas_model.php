@@ -787,7 +787,7 @@ class Kelas_model extends CI_Model {
 	}
 
 	public function getJadwalByMateri($id, $jenis, $tp, $smt) {
-        $this->db->select('id_kjm, id_kelas, jadwal_materi, jurnal, (SELECT COUNT(id_materi) FROM log_materi WHERE kelas_jadwal_materi.id_kjm=log_materi.id_materi) AS jml_siswa');
+        $this->db->select('id_kjm, id_kelas, jadwal_materi, jurnal, link_file, (SELECT COUNT(id_materi) FROM log_materi WHERE kelas_jadwal_materi.id_kjm=log_materi.id_materi) AS jml_siswa');
 		$this->db->where('id_materi', $id);
         $this->db->where('jenis', $jenis);
 		$this->db->where('id_tp', $tp);
