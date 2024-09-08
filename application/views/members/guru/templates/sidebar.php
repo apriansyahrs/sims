@@ -219,6 +219,13 @@
 						-->
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <a href="<?= base_url('datadokumen') ?>" class="nav-link <?= $page === 'datadokumen' ? "active" : "" ?>">
+                        <i class="fa fa-folder-open nav-icon"></i>
+                        <p>Dokumen Guru<div class="badge badge-sm badge-danger ml-1">Baru</div>
+                        </p>
+                    </a>
+                </li>
                 <?php if ($guru->id_jabatan == '4') : ?>
                     <li class="nav-item has-treeview <?= in_array($page, $wali) ? "menu-open" : "" ?>">
                         <a href="#" class="nav-link <?= in_array($page, $wali) ? "active" : "" ?>">

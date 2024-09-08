@@ -54,7 +54,7 @@
                                         <td><a href="<?= $row->link_dokumen ?>" target="_blank"><?= $row->link_dokumen ?></a></td>
                                         <td>
                                             <div class="text-center">
-                                                <a class="btn btn-xs btn-warning editRecord" data-toggle="modal" data-target="#editDokumenModal" data-deletable="<?= $row->deletable ?>" data-id='<?= $row->id_dokumen ?>' data-dokumen="<?= $row->nama_dokumen ?>"  data-link='<?= $row->link_dokumen ?>'>
+                                                <a class="btn btn-xs btn-warning editRecord" data-toggle="modal" data-target="#editDokumenModal" data-deletable="<?= isset($row->deletable) ? $row->deletable : 'false' ?>" data-id='<?= $row->id_dokumen ?>' data-dokumen="<?= $row->nama_dokumen ?>" data-link='<?= $row->link_dokumen ?>'>
                                                     <i class="fa fa-pencil-alt text-white"></i>
                                                 </a>
                                             </div>

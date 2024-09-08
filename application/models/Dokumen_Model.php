@@ -7,6 +7,12 @@ class Dokumen_Model extends CI_Model {
         $query = $this->db->get('master_dokumen');
         return $query->result();
     }
+    
+    function getDataDokumenByUserId($id_user) {
+        $this->db->where('id_user', $id_user);
+        $query = $this->db->get('master_dokumen');
+        return $query->result();
+    }
 
     function insertDataDokumen($data) {
         $this->db->insert('master_dokumen', $data);
