@@ -158,7 +158,7 @@ foreach ($materi as $k => $m) {
                                                         ? $kelas_materi[$value->id_materi][$arr[0]]
                                                         : '' ?></b>
                                             </td>
-                                            <td class="align-middle text-center">
+                                            <td class="align-middle text-center p-0 m-0">
                                                 <?php
                                                 $arrtgl = '';
                                                 $disableDates = [];
@@ -171,9 +171,17 @@ foreach ($materi as $k => $m) {
                                                             $len = $sisa === 3 ? 2 : 1;
                                                             $jam = substr($jtgl->id_kjm, strlen($jtgl->id_kjm ?? '') - $sisa, $len);
                                                             $ctgl = singkat_tanggal(date('d M Y', strtotime($jtgl->jadwal_materi)));
-                                                            $arrtgl .= '<div class="m-1"><span class="bg-circle bg-gray-light border text-sm">Jurnal: ' . $jtgl->jurnal . ' - Tanggal: ' . $ctgl . ' jam: ' . $jam
+
+                                                            // Tambahkan badge untuk link file
+                                                            $linkFileBadge = '';
+                                                            if (!empty($jtgl->link_file)) {
+                                                                $linkFileBadge = '<a href="' . $jtgl->link_file . '" target="_new" class="btn btn-sm btn-info m-1"> ' . $jtgl->jurnal . '</a>';
+                                                            }
+
+                                                            // Tampilkan jurnal, tanggal, jam, dan tombol hapus
+                                                            $arrtgl .= '<div class="border-bottom p-1"><span class="bg-circle bg-gray-light border text-sm">Tanggal: ' . $ctgl . ' jam: ' . $jam
                                                                 . '<button class="btn btn-sm" data-tgl="' . $ctgl . '" data-id="' . $jtgl->id_kjm . '" onclick="hapusTgl(this)" ' . $disabledBtn
-                                                                . '><i class="fa fa-times-circle-o"></i></button></span></div>';
+                                                                . '><i class="fa fa-times-circle-o"></i></button></span>' . $linkFileBadge . '</div>';
                                                         }
                                                     }
                                                 }
@@ -190,6 +198,7 @@ foreach ($materi as $k => $m) {
                                                     <i class="fa fa-calendar-check-o"></i>
                                                 </button>
                                             </td>
+
                                             <?php
                                             $stt = $value->status == '1' ? 'Aktif' : 'Non Aktif';
                                             $btn_bg = $value->status == '1' ? 'bg-success' : 'bg-warning';
@@ -378,15 +387,19 @@ foreach ($materi as $k => $m) {
                     <input class="d-none" type="text" name="jadwal_materi" value="">
                     <div class="row align-items-center mb-3">
                         <span class="col-3 text-bold">Jam Ke:</span>
-                        <select id="jam-ke" name="jam_ke" class="form-control col-6" required="">
+                        <select id="jam-ke" name="jam_ke" class="form-control col-6" required>
                             <option>
                                 Pilih tanggal dulu
                             </option>
                         </select>
                     </div>
-                    <div class="row align-items-center">
+                    <div class="row align-items-center mb-3">
                         <span class="col-3 text-bold">Jurnal</span>
-                        <input type="text" name="jurnal" class="form-control col-6" required="">
+                        <input type="text" name="jurnal" class="form-control col-6" placeholder="Materi..." required>
+                    </div>
+                    <div class="row align-items-center">
+                        <span class="col-3 text-bold">RPp</span>
+                        <input type="url" name="link_file" class="form-control col-6" placeholder="https://" required>
                     </div>
                 </div>
                 <?= form_close() ?>
@@ -423,6 +436,7 @@ foreach ($materi as $k => $m) {
     const thn = JSON.parse('<?= json_encode($tp_active) ?>');
     const smt = JSON.parse('<?= json_encode($smt_active) ?>');
     const days = JSON.parse('<?= json_encode($disabledDay) ?>');
+
     $(document).ready(function() {
         ajaxcsrf();
 

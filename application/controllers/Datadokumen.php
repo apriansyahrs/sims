@@ -25,12 +25,12 @@ class Datadokumen extends CI_Controller
         }
 
         // Memeriksa apakah pengguna adalah admin
-        if ($this->ion_auth->is_admin()) {
-            // Jika iya, lanjutkan eksekusi
-        } else {
-            // Jika bukan, tampilkan pesan error
-            show_error("Hanya Admin yang memiliki akses halaman ini", 403, "Akses Dilarang");
-        }
+        // if ($this->ion_auth->is_admin()) {
+        //     // Jika iya, lanjutkan eksekusi
+        // } else {
+        //     // Jika bukan, tampilkan pesan error
+        //     show_error("Hanya Admin yang memiliki akses halaman ini", 403, "Akses Dilarang");
+        // }
     }
 
 
@@ -45,22 +45,65 @@ class Datadokumen extends CI_Controller
     }
 
 
+    // public function index()
+    // {
+    //     $user = $this->ion_auth->user()->row(); // Mengambil data user yang sedang login
+    //     $data = [
+    //         'user' => $user,
+    //         'judul' => 'Dokumen',
+    //         'subjudul' => 'Daftar Dokumen',
+    //         'dokumens' => $this->dokumen->getDataDokumen(),
+    //         'tp_active' => $this->dashboard->getTahunActive(),
+    //         'smt_active' => $this->dashboard->getSemesterActive(),
+    //         'setting' => $this->dashboard->getSetting(),
+    //     ];
+
+    //     // Memuat view yang sesuai
+    //     $this->load->view('members/guru/templates/header', $data);
+    //     $this->load->view("master/dokumen/data");
+    //     $this->load->view('members/guru/templates/footer');
+    // }
+
     public function index()
     {
-        $user = $this->ion_auth->user()->row();
-        $data['tp_active'] = $this->dashboard->getTahunActive();
-        $data['smt_active'] = $this->dashboard->getSemesterActive();
-        $data['setting'] = $this->dashboard->getSetting();
-        $data['profile'] = $this->dashboard->getProfileAdmin($user->id);
-        $data['user'] = $user;
-        $data['judul'] = 'Dokumen';
-        $data['subjudul'] = 'Daftar Dokumen';
-        $data['dokumens'] = $this->dokumen->getDataDokumen();
+        $setting = $this->dashboard->getSetting();
+        $user = $this->ion_auth->user()->row(); // Mengambil data user yang sedang login
+        $data = [
+            'user'             => $user,
+            'judul'            => 'Dokumen Guru',
+            'subjudul'        => 'Daftar dokumen',
+            'setting'        => $setting
+        ];
+
+        $tp = $this->dashboard->getTahunActive();
+        $smt = $this->dashboard->getSemesterActive();
+
+        $data['tp'] = $this->dashboard->getTahun();
+        $data['tp_active'] = $tp;
+        $data['smt'] = $this->dashboard->getSemester();
+        $data['smt_active'] = $smt;
 
         // Memuat view yang sesuai
-        $this->load->view("_templates/dashboard/_header", $data);
-        $this->load->view("master/dokumen/data");
-        $this->load->view("_templates/dashboard/_footer");
+        if ($this->ion_auth->is_admin()) {
+            $data['profile'] = $this->dashboard->getProfileAdmin($user->id);
+            $data['dokumens'] = $this->dokumen->getDataDokumen();
+
+            $this->load->view('_templates/dashboard/_header', $data);
+            $this->load->view('master/dokumen/data');
+            $this->load->view('_templates/dashboard/_footer');
+        } elseif ($this->ion_auth->in_group('guru')) {
+            $guru = $this->dashboard->getDataGuruByUserId($user->id, $tp->id_tp, $smt->id_smt);
+            if ($guru == null) {
+                $this->load->view('disable_login', $data);
+            } else {
+                $data['guru'] = $guru;
+                $data['dokumens'] = $this->dokumen->getDataDokumenByUserId($user->id);
+
+                $this->load->view('members/guru/templates/header', $data);
+                $this->load->view('master/dokumen/data');
+                $this->load->view('members/guru/templates/footer');
+            }
+        }
     }
 
 
@@ -68,9 +111,12 @@ class Datadokumen extends CI_Controller
     {
         $nama_dokumen = $this->input->post('nama_dokumen');
         $link_dokumen = $this->input->post('link_dokumen');
+        $user = $this->ion_auth->user()->row();
+
         $insert = array(
             'nama_dokumen' => $nama_dokumen,
-            'link_dokumen' => $link_dokumen
+            'link_dokumen' => $link_dokumen,
+            'id_user' => $user->id,
         );
 
         $this->dokumen->insertDataDokumen($insert);
