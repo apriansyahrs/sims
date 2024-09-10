@@ -14,6 +14,7 @@ class Datadokumen extends CI_Controller
         // Memuat model 'Dashboard_model' dengan alias 'dashboard'
         $this->load->model("Dashboard_model", "dashboard");
         $this->load->model("Dokumen_Model", "dokumen");
+        $this->load->model('Dropdown_model', 'dropdown');
 
 
         // Memuat helper 'directory'
@@ -85,8 +86,22 @@ class Datadokumen extends CI_Controller
 
         // Memuat view yang sesuai
         if ($this->ion_auth->is_admin()) {
+            $id_guru = $this->input->get('id');
+
             $data['profile'] = $this->dashboard->getProfileAdmin($user->id);
-            $data['dokumens'] = $this->dokumen->getDataDokumen();
+            $allGuru = $this->dropdown->getAllGuruDokumen();
+            // array_unshift($allGuru, ['00' => 'Semua Guru']);
+            $data['gurus'] = $allGuru;
+            $data['id_guru'] = $id_guru == null ? '' : $id_guru;
+
+            // Mendapatkan dokumen berdasarkan ID guru (jika diberikan)
+            if ($id_guru != null) {
+                $dokumen = $this->dokumen->getDataDokumenByUserId($id_guru);
+            } else {
+                $dokumen = $this->dokumen->getDataDokumen();  // Jika ID guru tidak diberikan, ambil semua dokumen
+            }
+
+            $data['dokumens'] = $dokumen;
 
             $this->load->view('_templates/dashboard/_header', $data);
             $this->load->view('master/dokumen/data');

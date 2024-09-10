@@ -386,7 +386,7 @@ foreach ($materi as $k => $m) {
                     <input class="d-none" type="text" name="id_mapel" value="">
                     <input class="d-none" type="text" name="jadwal_materi" value="">
                     <div class="row align-items-center mb-3">
-                        <span class="col-3 text-bold">Jam Ke:</span>
+                        <span class="col-4 text-bold">Jam Ke:</span>
                         <select id="jam-ke" name="jam_ke" class="form-control col-6" required>
                             <option>
                                 Pilih tanggal dulu
@@ -394,11 +394,11 @@ foreach ($materi as $k => $m) {
                         </select>
                     </div>
                     <div class="row align-items-center mb-3">
-                        <span class="col-3 text-bold">Jurnal</span>
+                        <span class="col-4 text-bold">Jurnal</span>
                         <input type="text" name="jurnal" class="form-control col-6" placeholder="Materi..." required>
                     </div>
                     <div class="row align-items-center">
-                        <span class="col-3 text-bold">RPp</span>
+                        <span class="col-4 text-bold">Modul Ajar/RPP</span>
                         <input type="url" name="link_file" class="form-control col-6" placeholder="https://" required>
                     </div>
                 </div>
