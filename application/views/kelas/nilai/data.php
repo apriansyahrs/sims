@@ -135,7 +135,7 @@
 
 <script>
     var docTitle = '';
-    const namaBulan = ["", "Januar1", "Februar1", "Maret", "April", "Mei", "Juni",
+    const namaBulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
         "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
     var styleHead = 'data-fill-color="ffffff" data-t="s" data-a-v="middle" data-a-h="center" data-b-a-s="medium" data-f-bold="true"';
@@ -163,15 +163,23 @@
 
         docTitle += 'Rekap Nilai ' + selmapel + ' ' + selkelas + ' ' + sthn + ' ' + selsmt;
 
-        if (data.mapels.length == 0) {
-            $('#konten-absensi').html('<p>Tidak Jadwal untuk mapel ' + selmapel + ' kelas ' + selkelas + '</p>');
+        // Validasi data yang diterima
+        if (!data || !data.mapels || !data.bulans || Object.keys(data.mapels).length === 0) {
+            $('#konten-absensi').html('<p>Data tidak ditemukan untuk mapel ' + selmapel + ' kelas ' + selkelas + '</p>');
             $('#loading').addClass('d-none');
             return;
         }
 
+        // Debugging data jika diperlukan
+        console.log('Data yang diterima:', data);
+
         var numCol = 0;
         $.each(data.bulans, function (k, v) {
-            numCol += Object.keys(data.materi[v]).length;
+            if (data.materi && data.materi[v]) {
+                numCol += Object.keys(data.materi[v]).length;
+            } else {
+                console.warn(`Tidak ada materi untuk bulan ${v}`);
+            }
         });
 
         var konten = '<div style="width:100%;" id="jdl"><p style="text-align:center;font-size:14pt; font-weight: bold">REKAPITULASI NILAI SISWA</p></div>' +
@@ -203,11 +211,9 @@
 
         $.each(data.bulans, function (k, v) {
             var ind = parseInt(v);
-            var lon = Object.keys(data.materi[v]).length;
+            var lon = (data.materi && data.materi[v]) ? Object.keys(data.materi[v]).length : 0;
             konten += '<th colspan="' + lon + '"  style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleHead + '>' + namaBulan[ind] + '</th>';
             konten += '<th rowspan="2" class="tanggal" style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleHead + '>RT</th>';
-            //var th = parseInt(sthn);
-            //if (!(th>today.getFullYear()) && !(ind > today.getMonth()) {}
         });
 
         konten += '</tr><tr>';
@@ -215,11 +221,13 @@
         var colWidth = '4,15,35';
         $.each(data.bulans, function (i, bln) {
             var no = 1;
-            $.each(data.materi[bln], function (tgl, jam) {
-                konten += '<th class="tanggal" style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleHead + '>P' + no + '</th>';
-                no++;
-                colWidth += ',4';
-            });
+            if (data.materi && data.materi[bln]) {
+                $.each(data.materi[bln], function (tgl, jam) {
+                    konten += '<th class="tanggal" style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleHead + '>P' + no + '</th>';
+                    no++;
+                    colWidth += ',4';
+                });
+            }
         });
         colWidth += ',4,4,4,4,4,4,15';
         konten += '</tr></thead><tbody>';
@@ -230,71 +238,45 @@
                 '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleNormal + '>' + no + '</td>' +
                 '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleNormal + '>' + +value.nis + '</td>' +
                 '<td class="nama-siswa" style="border: 1px solid #c0c0c0; vertical-align: middle;" ' + styleNama + '>' + value.nama + '</td>';
+
             var totalMtr = 0;
             var totalNilai = 0;
             $.each(data.bulans, function (i, nbln) {
-                var tgls = Object.keys(data.materi[nbln]);
-                tgls.sort(function (a, b) {
-                    return (a < b) ? -1 : 1;
-                });
-                var jmlMtrBulan = 0;
-                var jmlNilaiBulan = 0;
-                $.each(tgls, function (index, tgl) {
-                    var a = new Date(sthn, parseInt(nbln) - 1, tgl);
-                    var d = a.getDay();
-                    var arrJam = [];
-
-                    if (a <= today) {
-                        var adaMateri = {}, adaTugas = {};
-                        var jadwalPerHari = data.mapels[d];
-                        $.each(jadwalPerHari, function (jamke, valJam) {
-                            arrJam.push(jamke);
-                            adaMateri[jamke] = data.materi[nbln][tgl][jamke]['1'] != null;
-                            adaTugas[jamke] = data.materi[nbln][tgl][jamke]['2'] != null;
-                        });
-                        var bg = 'lightgrey';
-                        var style = styleNormal;
+                if (data.materi && data.materi[nbln]) {
+                    var tgls = Object.keys(data.materi[nbln]);
+                    tgls.sort(function (a, b) {
+                        return (a < b) ? -1 : 1;
+                    });
+                    var jmlMtrBulan = 0;
+                    var jmlNilaiBulan = 0;
+                    $.each(tgls, function (index, tgl) {
                         var nilaiMateri = 0, nilaiTugas = 0;
-                        var jmlJamMtr = 0;
-                        $.each(arrJam, function (index, jj) {
-                            if (adaMateri[jj]) {
-                                jmlJamMtr += 1;
-                            }
-                            if (adaTugas[jj]) {
-                                jmlJamMtr += 1;
-                            }
-
-                            bg = !adaMateri[jj] && !adaTugas[jj] ? 'lightgrey' : 'white';
-                            style = !adaMateri[jj] && !adaTugas[jj] ? styleEmpty : styleNormal;
-                            if (value.nilai_materi[nbln] != null && value.nilai_materi[nbln][tgl] != null && value.nilai_materi[nbln][tgl][jj] != null && value.nilai_materi[nbln][tgl][jj].nilai != null) {
-                                if (adaMateri[jj]) {
-                                    nilaiMateri += parseInt(value.nilai_materi[nbln][tgl][jj].nilai);
-                                }
-                            }
-                            if (value.nilai_tugas[nbln] != null && value.nilai_tugas[nbln][tgl] != null && value.nilai_tugas[nbln][tgl][jj] != null && value.nilai_tugas[nbln][tgl][jj].nilai != null) {
-                                if (adaTugas[jj]) nilaiTugas += parseInt(value.nilai_tugas[nbln][tgl][jj].nilai);
-                            }
-                        });
+                        if (value.nilai_materi && value.nilai_materi[nbln] && value.nilai_materi[nbln][tgl]) {
+                            nilaiMateri = value.nilai_materi[nbln][tgl].nilai || 0;
+                        }
+                        if (value.nilai_tugas && value.nilai_tugas[nbln] && value.nilai_tugas[nbln][tgl]) {
+                            nilaiTugas = value.nilai_tugas[nbln][tgl].nilai || 0;
+                        }
                         var nilaiHarian = nilaiMateri + nilaiTugas;
-                        jmlMtrBulan += jmlJamMtr;
+                        jmlMtrBulan += 1;
                         jmlNilaiBulan += nilaiHarian;
-                        var nm = nilaiMateri == 0 ? '&ensp;' : '' + Math.round(nilaiHarian / jmlJamMtr);
-                        konten += '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;background: ' + bg + '" ' + style + '>' + nm + '</td>';
-                    } else {
-                        konten += '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;background: #FEFEC5" ' + styleNonaktif + '>&ensp;</td>';
-                    }
-                });
 
-                totalMtr += jmlMtrBulan;
-                totalNilai += jmlNilaiBulan;
-                var rtb = jmlMtrBulan == 0 && jmlNilaiBulan == 0 ? '0' : '' + Math.round(jmlNilaiBulan / jmlMtrBulan);
-                konten += '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleRata + '>' + rtb + '</td>';
+                        var nm = nilaiMateri == 0 ? '&ensp;' : '' + Math.round(nilaiHarian / jmlMtrBulan);
+                        konten += '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleNormal + '>' + nm + '</td>';
+                    });
+
+                    totalMtr += jmlMtrBulan;
+                    totalNilai += jmlNilaiBulan;
+                    var rtb = jmlMtrBulan == 0 && jmlNilaiBulan == 0 ? '0' : '' + Math.round(jmlNilaiBulan / jmlMtrBulan);
+                    konten += '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleRata + '>' + rtb + '</td>';
+                }
             });
             var rts = totalMtr == 0 && totalNilai == 0 ? '0' : '' + Math.round(totalNilai / totalMtr);
             konten += '<td style="border: 1px solid #c0c0c0; text-align: center; vertical-align: middle;margin: 0px;" ' + styleRata + '>' + rts + '</td>' +
                 '</tr>';
             no += 1;
         });
+
         catatan = '<span><b>Catatan:</b></span><ul>' +
             '<li> Jumlah penilaian dihitung dari jumlah hari tiap mapel dalam 1 bulan</li>' +
             '<li> Nilai harian dihitung rata-rata dari jumlah jam perhari</li>' +
@@ -302,41 +284,7 @@
         konten += '</tbody></table>' + catatan;
         $('#konten-absensi').html(konten);
 
-        $.each($('table#log-nilai').find('th'), function () {
-            if ($(this).hasClass("tanggal")) {
-                $(this).html('<p style=" font-size: 8pt; margin: 1px 2px; display: block; text-align: center; vertical-align: middle;"> ' + $(this).html() + '</p>')
-            } else {
-                $(this).html('<p style="margin: 1px 2px; display: block; text-align: center; vertical-align: middle;"> ' + $(this).html() + '</p>')
-            }
-        });
-
-        $.each($('table#log-nilai').find('td'), function () {
-            if ($(this).hasClass("nama-siswa")) {
-                $(this).html('<p style="width: 150px; margin: 1px 2px; -webkit-line-clamp: 1; overflow : hidden; text-overflow: ellipsis; display: -webkit-box;-webkit-box-orient: vertical;"> ' + $(this).text() + '</p>')
-            } else {
-                $(this).html('<p style="margin: 1px 2px; display: inline;"> ' + $(this).text() + '</p>')
-            }
-        });
-
         $('#loading').addClass('d-none');
-
-        var title = $('#jdl').html();
-        var trsAtas = $('table#atas tbody').html();
-        var trsHead = $('table#log-nilai thead').html();
-        var trsBody = $('table#log-nilai tbody').html();
-        var copy = '<table id="excel" style="font-size: 11pt;" data-cols-width="' + colWidth + '"><tbody>' +
-            '<tr>' +
-            '<td colspan="' + (numCol + 9) + '" data-a-v="middle" data-a-h="center" data-f-bold="true">' + title + '</td>' +
-            '</tr>' +
-            trsAtas +
-            trsHead +
-            trsBody +
-            '<tr>' +
-            '<td colspan="' + (numCol + 9) + '" data-a-v="middle"">' + catatan + '</td>' +
-            '</tr>' +
-            '</tbody>';
-
-        $('#konten-copy').html(copy);
     }
 
     $(document).ready(function () {
@@ -354,7 +302,7 @@
             var sthn = smt === '1' ? thnSplit[0] : thnSplit[1];
             var empty = mapel === '' || kls === '' || thn === '' || smt === '' || mapel == null || kls == null || thn == null || smt == null;
             var newData = 'kelas=' + kls + '&mapel=' + mapel + '&tahun=' + thn + '&smt=' + smt + '&stahun=' + sthn;
-            console.log(newData);
+
             if (!empty) {
                 $('#loading').removeClass('d-none');
 
@@ -363,12 +311,12 @@
                         url: base_url + 'kelasnilai/loadnilaimapel?' + newData,
                         type: "GET",
                         success: function (data) {
-                            console.log(data);
-                            if (data.length === 0) {
+                            if (data && Object.keys(data).length > 0) {
+                                createTable(data);
+                            } else {
                                 $('#log-nilai').html('');
                                 $('#loading').addClass('d-none');
-                            } else {
-                                createTable(data)
+                                console.warn('Data kosong');
                             }
                         },
                         error: function (xhr, status, error) {
@@ -395,41 +343,10 @@
             reload(selMapel.val(), selKelas.val(), selTahun.val(), $(this).val());
         });
 
-        //reload('14', '101', '2', '1');
         selMapel.select2({theme: 'bootstrap4'});
         selKelas.select2({theme: 'bootstrap4'});
         selSmt.select2({theme: 'bootstrap4'});
         selTahun.select2({theme: 'bootstrap4'});
     });
-
-    function print() {
-        var title = document.title;
-        document.title = docTitle;
-        $('#konten-absensi').print(docTitle);
-        document.title = title;
-    }
-
-    function exportWord() {
-        var contentDocument = $('#konten-absensi').convertToHtmlFile(docTitle, '');
-        var content = '<!DOCTYPE html>' + contentDocument.documentElement.outerHTML;
-        //console.log('css', content);
-        var converted = htmlDocx.asBlob(content, {
-            orientation: 'landscape',
-            size: 'A4',
-            margins: {top: 700, bottom: 700, left: 1000, right: 1000}
-        });
-
-        saveAs(converted, docTitle + '.docx');
-    }
-
-    function exportExcel() {
-        var table = document.querySelector("#excel");
-        TableToExcel.convert(table, {
-            name: docTitle + '.xlsx',
-            sheet: {
-                name: "Sheet 1"
-            }
-        });
-    }
 
 </script>

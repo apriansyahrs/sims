@@ -87,9 +87,17 @@
                                             $ret = [];
                                             foreach ($tp as $key => $row) {
                                                 $thn = explode("/", $row->tahun);
-                                                $ret [$thn[0]] = $thn[0];
-                                                $ret [$thn[1]] = $thn[1];
+                                                
+                                                // Pastikan $thn memiliki setidaknya dua elemen
+                                                if (isset($thn[0])) {
+                                                    $ret[$thn[0]] = $thn[0]; // Tahun pertama
+                                                }
+                                                
+                                                if (isset($thn[1])) {
+                                                    $ret[$thn[1]] = $thn[1]; // Tahun kedua
+                                                }
                                             }
+                                            
                                             echo form_dropdown(
                                                 'tahun',
                                                 $ret,
