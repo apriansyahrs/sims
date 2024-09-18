@@ -195,6 +195,8 @@ class Cbtanalisis extends MY_Controller
             $data['profile'] = $this->dashboard->getProfileAdmin($user->id);
             $data['kodejadwal'] = $this->dropdown->getAllJadwal($thn_sel, $smt_sel);
 
+            $data['urlJenis'] = 'jenis_ujian';
+
             $this->load->view('_templates/dashboard/_header', $data);
             $this->load->view('cbt/analisis/data');
             $this->load->view('_templates/dashboard/_footer');
@@ -203,6 +205,9 @@ class Cbtanalisis extends MY_Controller
             $nguru[$guru->id_guru] = $guru->nama_guru;
             $data['guru'] = $guru;
             $data['kodejadwal'] = $this->dropdown->getAllJadwalGuru($thn_sel, $smt_sel, $guru->id_guru);
+
+            $data['id_guru'] = $guru->id_guru;
+            $data['urlJenis'] = 'jenis_ujian';
 
             $this->load->view('members/guru/templates/header', $data);
             $this->load->view('cbt/analisis/data');

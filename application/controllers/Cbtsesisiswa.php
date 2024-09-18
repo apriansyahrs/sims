@@ -4,13 +4,15 @@
     |    https://github.com/garudacbt/cbt    |
     |________________________________________|
 */
-class Cbtsesisiswa extends CI_Controller {
+class Cbtsesisiswa extends MY_Controller
+{
 
-	public function __construct() {
+	public function __construct()
+	{
 		parent::__construct();
 		if (!$this->ion_auth->logged_in()) {
 			redirect('auth');
-		} else if (!$this->ion_auth->is_admin()) {
+		} else if (!$this->ion_auth->is_admin() && !$this->ion_auth->in_group('guru')) {
 			show_error('Hanya Administrator yang diberi hak untuk mengakses halaman ini, <a href="' . base_url('dashboard') . '">Kembali ke menu awal</a>', 403, 'Akses Terlarang');
 		}
 		$this->load->library(['datatables', 'form_validation']); // Load Library Ignited-Datatables
@@ -18,16 +20,18 @@ class Cbtsesisiswa extends CI_Controller {
 		$this->load->model('Dashboard_model', 'dashboard');
 		$this->load->model('Cbt_model', 'cbt');
 		$this->load->model('Dropdown_model', 'dropdown');
-        $this->load->model('Kelas_model', 'kelas');
+		$this->load->model('Kelas_model', 'kelas');
 		$this->form_validation->set_error_delimiters('', '');
 	}
 
-	public function output_json($data, $encode = true) {
+	public function output_json($data, $encode = true)
+	{
 		if ($encode) $data = json_encode($data);
 		$this->output->set_content_type('application/json')->set_output($data);
 	}
 
-	public function index() {
+	public function index()
+	{
 		$tp = $this->dashboard->getTahunActive();
 		$smt = $this->dashboard->getSemesterActive();
 
@@ -48,29 +52,58 @@ class Cbtsesisiswa extends CI_Controller {
 			'profile'		=> $this->dashboard->getProfileAdmin($user->id),
 		];
 
-        $kls = $this->input->get('kls', true);
-        $kelas_selected = $kls != null ? $kls : '0';
-        $siswas = [];
-        if ($kelas_selected != '0') {
-            $siswas = $this->cbt->getRuangSesiSiswa($kls, $tp->id_tp, $smt->id_smt);
-        }
-        $data['siswas'] = $siswas;
-        $data['kelas_selected'] = $kelas_selected;
+		$kls = $this->input->get('kls', true);
+		$kelas_selected = $kls != null ? $kls : '0';
+		$siswas = [];
+		if ($kelas_selected != '0') {
+			$siswas = $this->cbt->getRuangSesiSiswa($kls, $tp->id_tp, $smt->id_smt);
+		}
+		$data['siswas'] = $siswas;
+		$data['kelas_selected'] = $kelas_selected;
 
-		$this->load->view('_templates/dashboard/_header', $data);
-		$this->load->view('cbt/sesisiswa/data');
-		$this->load->view('_templates/dashboard/_footer');
+
+
+		if ($this->ion_auth->is_admin()) {
+			$this->load->view('_templates/dashboard/_header', $data);
+			$this->load->view('cbt/sesisiswa/data');
+			$this->load->view('_templates/dashboard/_footer');
+		} else {
+			$guru = $this->dashboard->getDataGuruByUserId($user->id, $tp->id_tp, $smt->id_smt);
+            $data['guru'] = $guru;
+			$id_guru = $guru->id_guru;
+
+			$mapel_guru = $this->kelas->getGuruMapelKelas($id_guru, $tp->id_tp, $smt->id_smt);
+            $mapel = json_decode(json_encode($this->maybe_unserialize($mapel_guru->mapel_kelas ?? '')));
+
+            $arrKelas = [];
+            if ($mapel != null) {
+                foreach ($mapel as $m) {
+                    $arrMapel[$m->id_mapel] = $m->nama_mapel;
+                    foreach ($m->kelas_mapel as $kls) {
+                        if ($kls->kelas) $arrKelas[$kls->kelas] = $this->dropdown->getNamaKelasById($tp->id_tp, $smt->id_smt, $kls->kelas);
+                    }
+                }
+            }
+            $data['kelas'] = $arrKelas;
+			
+			$this->load->view('members/guru/templates/header', $data);
+			$this->load->view('cbt/sesisiswa/data');
+			$this->load->view('members/guru/templates/footer');
+		}
 	}
 
-	public function getAllRuang() {
+	public function getAllRuang()
+	{
 		$this->output_json($this->cbt->getAllRuang());
 	}
 
-	public function getAllSesi() {
+	public function getAllSesi()
+	{
 		$this->output_json($this->dropdown->getAllSesi());
 	}
 
-	public function add() {
+	public function add()
+	{
 		$insert = [
 			'nama_sesi' => $this->input->post('nama_sesi', true),
 			'kode_sesi' => $this->input->post('kode_sesi', true),
@@ -83,12 +116,14 @@ class Cbtsesisiswa extends CI_Controller {
 		$this->output_json($data);
 	}
 
-	public function update() {
+	public function update()
+	{
 		$data = $this->cbt->updateSesi();
 		$this->output->set_content_type('application/json')->set_output($data);
 	}
 
-	public function delete() {
+	public function delete()
+	{
 		$chk = $this->input->post('checked', true);
 		if (!$chk) {
 			$this->output_json(['status' => false]);
@@ -109,50 +144,52 @@ class Cbtsesisiswa extends CI_Controller {
 	}
 	*/
 
-	public function editsesisiswa() {
-        $rs = $this->input->post('ruang-sesi', true);
-        $tp = $this->dashboard->getTahunActive();
-        $smt = $this->dashboard->getSemesterActive();
-        $update = false;
-        foreach ($rs as $id=>$klss) {
-            foreach ($klss as $idkls=>$kls) {
-                $data = [
-                    'siswa_id'	=> $id,
-                    'kelas_id'	=> $idkls,
-                    'ruang_id'	=> $kls['ruang'],
-                    'sesi_id'	=> $kls['sesi'],
-                    'tp_id'		=> $tp->id_tp,
-                    'smt_id'	=> $smt->id_smt
-                ];
-                $update = $this->db->replace('cbt_sesi_siswa', $data);
-            }
-        }
+	public function editsesisiswa()
+	{
+		$rs = $this->input->post('ruang-sesi', true);
+		$tp = $this->dashboard->getTahunActive();
+		$smt = $this->dashboard->getSemesterActive();
+		$update = false;
+		foreach ($rs as $id => $klss) {
+			foreach ($klss as $idkls => $kls) {
+				$data = [
+					'siswa_id'	=> $id,
+					'kelas_id'	=> $idkls,
+					'ruang_id'	=> $kls['ruang'],
+					'sesi_id'	=> $kls['sesi'],
+					'tp_id'		=> $tp->id_tp,
+					'smt_id'	=> $smt->id_smt
+				];
+				$update = $this->db->replace('cbt_sesi_siswa', $data);
+			}
+		}
 		$data['status'] = $update;
 		$this->output_json($data);
 	}
 
-	public function editsesikelas() {
+	public function editsesikelas()
+	{
 		$input = json_decode($this->input->post('kelas_sesi', true));
 
 		$tp = $this->dashboard->getTahunActive();
 		$smt = $this->dashboard->getSemesterActive();
 
 		foreach ($input as $d) {
-            $siswas = $this->kelas->getKelasSiswa($d->kelas_id, $tp->id_tp, $smt->id_smt);
+			$siswas = $this->kelas->getKelasSiswa($d->kelas_id, $tp->id_tp, $smt->id_smt);
 
-            foreach ($siswas as $siswa) {
-                $data = [
-                    'siswa_id'	=> $siswa->id_siswa,
-                    'kelas_id'	=> $siswa->id_kelas,
-                    'ruang_id'	=> $d->ruang_id,
-                    'sesi_id'	=> $d->sesi_id,
-                    'tp_id'		=> $tp->id_tp,
-                    'smt_id'	=> $smt->id_smt
-                ];
-                $this->db->replace('cbt_sesi_siswa', $data);
-            }
+			foreach ($siswas as $siswa) {
+				$data = [
+					'siswa_id'	=> $siswa->id_siswa,
+					'kelas_id'	=> $siswa->id_kelas,
+					'ruang_id'	=> $d->ruang_id,
+					'sesi_id'	=> $d->sesi_id,
+					'tp_id'		=> $tp->id_tp,
+					'smt_id'	=> $smt->id_smt
+				];
+				$this->db->replace('cbt_sesi_siswa', $data);
+			}
 
-            $data = [
+			$data = [
 				'id_kelas_ruang' => $d->kelas_id . $tp->id_tp . $smt->id_smt,
 				'id_kelas'	=> $d->kelas_id,
 				'id_ruang'	=> $d->ruang_id,
@@ -163,7 +200,6 @@ class Cbtsesisiswa extends CI_Controller {
 			];
 
 			$update = $this->db->replace('cbt_kelas_ruang', $data);
-
 		}
 
 		$data['status'] = $update;
