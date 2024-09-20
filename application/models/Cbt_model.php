@@ -94,6 +94,7 @@ class Cbt_model extends CI_Model
         return $query;
     }
 
+
     public function getDataSiswaById($id_tp, $id_smt, $idSiswa)
     {
         $this->db->select('b.id_siswa, b.nama, b.jenis_kelamin, b.nis, b.nisn, b.username, b.password,' .
@@ -2529,5 +2530,23 @@ class Cbt_model extends CI_Model
             }
         }
         return $ret;
+    }
+
+    public function getDataOrangTuaSiswa($username, $id_tp, $id_smt)
+    {
+        $this->db->select('a.id_siswa, a.nisn, a.nis, a.nama, a.jenis_kelamin, a.username, a.password, a.agama, a.foto,' .
+            ' b.id_kelas_siswa, b.id_tp, b.id_smt, b.id_siswa, b.id_kelas,' .
+            ' c.nama_kelas, c.kode_kelas, c.level_id, ' .
+            ' d.kelas_id, d.ruang_id, d.sesi_id');
+        $this->db->from('master_siswa a');
+        $this->db->join('kelas_siswa b', 'a.id_siswa=b.id_siswa AND b.id_tp=' . $id_tp . ' AND b.id_smt=' . $id_smt, 'left');
+        $this->db->join('master_kelas c', 'b.id_kelas=c.id_kelas AND c.id_tp=' . $id_tp . ' AND c.id_smt=' . $id_smt, 'left');
+        $this->db->join('cbt_sesi_siswa d', 'a.id_siswa=d.siswa_id', 'left');
+        // Tambahkan kondisi untuk nohp ayah, ibu, atau wali
+        $this->db->where('nohp_ayah', $username);
+        $this->db->or_where('nohp_ibu', $username);
+        $this->db->or_where('nohp_wali', $username);
+        $query = $this->db->get()->row();
+        return $query;
     }
 }
