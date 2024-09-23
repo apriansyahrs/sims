@@ -4,7 +4,7 @@
     |    https://github.com/garudacbt/cbt    |
     |________________________________________|
 */
-class Siswa extends MY_Controller
+class Orangtua extends MY_Controller
 {
 
     public function __construct()
@@ -93,7 +93,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $dari = $siswa->id_siswa;
         $dari_group = 3;
         $data = [
@@ -128,7 +128,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $dari = $siswa->id_siswa;
         $dari_group = 3;
         $data = [
@@ -163,7 +163,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $setting = $this->dashboard->getSetting();
         $data = [
             'user' => $user,
@@ -232,7 +232,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $data = [
             'user' => $user,
             'siswa' => $siswa,
@@ -328,7 +328,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $setting = $this->dashboard->getSetting();
         $data = [
             'user' => $user,
@@ -480,7 +480,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $data = [
             'user' => $user,
             'siswa' => $siswa,
@@ -679,7 +679,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $data = [
             'user' => $user,
             'siswa' => $siswa,
@@ -745,7 +745,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
 
         $data = [
             'user' => $user,
@@ -1107,7 +1107,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
 
         $data = [
             'user' => $user,
@@ -1887,7 +1887,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $data = [
             'user' => $user,
             'siswa' => $siswa,
@@ -2178,7 +2178,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         $data = [
             'user' => $user,
             'siswa' => $siswa,
@@ -2246,7 +2246,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
         if ($siswa && $table === 'mapel') {
             $detail = $this->kelas->getCatatanMapelSiswaDetail($id_catatan);
         } else {
@@ -2269,7 +2269,7 @@ class Siswa extends MY_Controller
         $tp = $this->dashboard->getTahunActive();
         $smt = $this->dashboard->getSemesterActive();
         $user = $this->ion_auth->user()->row();
-        $siswa = $this->cbt->getDataSiswa($user->username, $tp->id_tp, $smt->id_smt);
+        $siswa = $this->cbt->getDataOrangTuaSiswa($user->username, $tp->id_tp, $smt->id_smt);
 
         if ($table == 'mapel') {
             $tbl = 'kelas_catatan_mapel';

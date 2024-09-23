@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: multazam
@@ -16,8 +17,8 @@
                     <div class="info-box bg-transparent shadow-none">
                         <img src="<?= base_url() ?>/assets/img/garuda_circle.png" width="60" height="60">
                         <div class="info-box-content">
-                                <span class="text-white"
-                                      style="font-size: 24pt; line-height: 0.7;"><b>SIMS-ALZ</b></span>
+                            <span class="text-white"
+                                style="font-size: 24pt; line-height: 0.7;"><b>SIMS-ALZ</b></span>
                             <span class="text-white">Al-Azhar CBT</span>
                         </div>
                     </div>
@@ -39,8 +40,8 @@
             </div>
         </div>
         <div class="container"
-             style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"
-             unselectable="on">
+            style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"
+            unselectable="on">
             <div class="row">
                 <div class="col-12">
                     <div class="card my-shadow">
@@ -55,7 +56,7 @@
                                     <span id="timer" class="text-bold">00:00:00</span>
                                 </button>
                                 <button data-toggle="modal" data-target="#daftarModal"
-                                        class="btn btn-primary btn-oval-sm">
+                                    class="btn btn-primary btn-oval-sm">
                                     <span class="d-none d-md-inline-block mr-2"><b>Daftar Soal</b></span>
                                     <i class="fa fa-th"></i>
                                 </button>
@@ -64,9 +65,9 @@
                         <div class="card-body p-3">
                             <div class="resize-text mb-3">
                                 <button class="btn btn-outline-primary btn-oval-sm no-hover" id="minus"><i
-                                            class="fa fa-minus"></i></button>
+                                        class="fa fa-minus"></i></button>
                                 <button class="btn btn-outline-primary btn-oval-sm no-hover" id="plus"><i
-                                            class="fa fa-plus"></i></button>
+                                        class="fa fa-plus"></i></button>
                             </div>
                             <?php
                             //echo '<pre>';
@@ -121,7 +122,7 @@
 </div>
 
 <div class="modal fade" id="daftarModal" tabindex="-1" role="dialog" aria-labelledby="daftarLabel"
-     aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -155,15 +156,17 @@
 <script>
     var elem = document.documentElement;
     history.pushState(null, null, '<?php echo $_SERVER["REQUEST_URI"]; ?>');
-    window.addEventListener('popstate', function (event) {
+    window.addEventListener('popstate', function(event) {
         loadSoalNomor(1);
     });
     const infoJadwal = JSON.parse(JSON.stringify(<?= json_encode($jadwal) ?>));
     let nomorSoal = 0;
     let idSoal, idSoalSiswa, jenisSoal, modelSoal, typeSoal;
-    let jawabanSiswa, jawabanBaru = null, jsonJawaban;
+    let jawabanSiswa, jawabanBaru = null,
+        jsonJawaban;
     let nav = 0;
-    let soalTerjawab = 0, soalTotal = 0;
+    let soalTerjawab = 0,
+        soalTotal = 0;
     let timerOut;
     let timerSelesai;
     //const durasi = JSON.parse(JSON.stringify(<?= json_encode($elapsed) ?>));
@@ -182,8 +185,8 @@
     let zoomClicked = 3;
     var arrSize = [];
 
-    $(document).ready(function () {
-        $(document).keydown(function (event) {
+    $(document).ready(function() {
+        $(document).keydown(function(event) {
             //console.log('press', event.keyCode);
             var charCode = event.charCode || event.keyCode || event.which;
             if (charCode == 27 || charCode == 91 || charCode == 92) {
@@ -206,7 +209,7 @@
             }
         });
 
-        $('#jawab').on('submit', function (e) {
+        $('#jawab').on('submit', function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
@@ -227,44 +230,48 @@
                 processData: false,
                 contentType: false,
                 data: formData,
-                success: function (response) {
+                success: function(response) {
                     soalTerjawab = response.soal_terjawab;
                     loadSoalNomor(nav);
                 },
-                error: function (xhr, error, status) {
+                error: function(xhr, error, status) {
                     showDangerToast('ERROR!');
                     console.log(xhr.responseText);
                 }
             });
         });
 
-        $("#plus").click(function () {
+        $("#plus").click(function() {
             if (zoomClicked > 20) return;
-            $(".konten-soal-jawab").find('*').not('.img-fluid').each(function (idx, v) {
+            $(".konten-soal-jawab").find('*').not('.img-fluid').each(function(idx, v) {
                 console.log(idx, parseInt($(v).css("font-size")));
                 var size = parseInt($(this).css("font-size"));
                 size = (size + 1) + "px";
-                $(this).css({'font-size': size});
+                $(this).css({
+                    'font-size': size
+                });
             });
-            $('.img-fluid').each(function () {
+            $('.img-fluid').each(function() {
                 var currWidth = parseInt($(this).css('width'));
                 $(this).css('width', (currWidth + 20) + 'px');
             });
-            zoomClicked +=1;
+            zoomClicked += 1;
         });
 
-        $("#minus").click(function () {
+        $("#minus").click(function() {
             if (zoomClicked <= 0) return;
-            $(".konten-soal-jawab").find('*').not('.img-fluid').each(function () {
+            $(".konten-soal-jawab").find('*').not('.img-fluid').each(function() {
                 var size = parseInt($(this).css("font-size"));
                 size = (size - 1) + "px";
-                $(this).css({'font-size': size});
+                $(this).css({
+                    'font-size': size
+                });
             });
-            $('.img-fluid').each(function () {
+            $('.img-fluid').each(function() {
                 var currWidth = parseInt($(this).css('width'));
                 $(this).css('width', (currWidth - 20) + 'px');
             });
-            zoomClicked -=1;
+            zoomClicked -= 1;
         });
 
         loadSoalNomor(1);
@@ -281,11 +288,12 @@
                 type: 'POST',
                 url: base_url + 'siswa/loadnomorsoal',
                 data: dataPost,
-                success: function (data) {
+                success: function(data) {
                     console.log('load soal', data);
                     $('#loading').addClass('d-none');
                     setKonten(data);
-                }, error: function (xhr, error, status) {
+                },
+                error: function(xhr, error, status) {
                     showDangerToast('ERROR!');
                     console.log(xhr.responseText);
                 }
@@ -297,7 +305,7 @@
 
     function loadSoal(datas) {
         $('#daftarModal').modal('hide').data('bs.modal', null);
-        $('#daftarModal').on('hidden', function () {
+        $('#daftarModal').on('hidden', function() {
             $(this).data('modal', null);
         });
 
@@ -343,7 +351,7 @@
         var jenis = data.soal_jenis;
         var html = '';
         if (jenis == "1") {
-            $.each(data.soal_opsi, function (key, opsis) {
+            $.each(data.soal_opsi, function(key, opsis) {
                 if (opsis.valAlias != "") {
                     html += '<label class="container-jawaban font-weight-normal">' + opsis.opsi +
                         '<input type="radio"' +
@@ -358,17 +366,17 @@
             });
             $('#konten-jawaban').html(html);
         } else if (jenis == "2") {
-            $.each(data.soal_opsi, function (key, opsis) {
+            $.each(data.soal_opsi, function(key, opsis) {
                 html += '<div class="custom-control custom-checkbox checkbox-xl">' +
                     '<input type="checkbox" class="check2 custom-control-input"' +
-                    'id="check'+key+'"' +
+                    'id="check' + key + '"' +
                     ' name="jawaban"' +
                     ' value="' + opsis.value.toUpperCase() + '"' +
                     ' data-max="' + data.max_jawaban[0] + '"' +
                     ' data-jawabansiswa="' + opsis.value.toUpperCase() + '"' +
                     ' onclick="submitJawaban(this)" ' + opsis.checked + '>' +
-                    '<label class="custom-control-label font-weight-normal" for="check'+key+'">'
-                    + opsis.opsi +'</label>' +
+                    '<label class="custom-control-label font-weight-normal" for="check' + key + '">' +
+                    opsis.opsi + '</label>' +
                     '</div>'
             });
             $('#konten-jawaban').html(html);
@@ -387,7 +395,7 @@
                 for (let i = 0; i < copy.tbody.length; i++) {
                     let val = copy.tbody[i]
                     for (let j = 0; j < val.length; j++) {
-                        if (j === 0) val[j] = copy.tabel[i+1][0]
+                        if (j === 0) val[j] = copy.tabel[i + 1][0]
                     }
                     arrData.push(val)
                 }
@@ -405,9 +413,9 @@
 
             let keys = 0
             let dataMax = {}
-            $.each(data.max_jawaban, function (key, val) {
+            $.each(data.max_jawaban, function(key, val) {
                 dataMax[keys] = val
-                keys ++
+                keys++
             })
 
             let objJawaban = {
@@ -422,7 +430,7 @@
                 data: objJawaban,
                 viewMode: '2',
                 id: nomorSoal,
-                callback: function (id, data, hasLinks, isOffset) {
+                callback: function(id, data, hasLinks, isOffset) {
                     if (isOffset !== '0') {
                         $.toast({
                             heading: 'Warning',
@@ -458,7 +466,7 @@
         $('#konten-modal').html(data.soal_modal);
 
         var $imgs = $('.konten-soal-jawab').find('img');
-        $.each($imgs, function () {
+        $.each($imgs, function() {
             var curSrc = $(this).attr('src');
             if (!curSrc.includes("uploads")) return;
             var newSrc = '';
@@ -470,18 +478,21 @@
                 var forReplace = curSrc.split(pathUpload);
                 newSrc = base_url + pathUpload + forReplace[1];
                 $(this).attr('src', newSrc);
-				$(this).removeAttr('alt');
+                $(this).removeAttr('alt');
             }
-            $(this).on('load', function () {
+            $(this).on('load', function() {
                 if ($(this).height() > 50) {
                     $(this).addClass('img-fluid');
                 }
             });
         });
 
-        $('video').css({'width': '100%', 'max-height': '100%'});
+        $('video').css({
+            'width': '100%',
+            'max-height': '100%'
+        });
 
-        $('.check').change(function (e) {
+        $('.check').change(function(e) {
             var row = $(e.target).closest('tr');
             var isChecked = $(row).find("input:checked");
             var max = $(e.target).data('max');
@@ -500,7 +511,7 @@
             }
         });
 
-        $("#jawaban-essai").on('change keyup paste', function () {
+        $("#jawaban-essai").on('change keyup paste', function() {
             submitJawaban(null);
         });
         if (!data.durasi) {
@@ -539,7 +550,7 @@
 
     function setElapsed(durasi) {
         elapsed = durasi.lama_ujian == null || durasi.lama_ujian == '0' ? "00:00:00" : durasi.lama_ujian;
-        createTimerCountdown(durasiUjian, elapsed.split(':'), function (isOver, remaining, onGoing) {
+        createTimerCountdown(durasiUjian, elapsed.split(':'), function(isOver, remaining, onGoing) {
             $('#timer').html(remaining);
             elapsed = onGoing;
             if (isOver) {
@@ -555,11 +566,11 @@
                     method: 'POST',
                     data: $('#jawab').serialize() + '&jadwal=' + jadwal + '&siswa=' + siswa + '&bank=' + bank +
                         '&waktu=' + $('#timer').text() + '&elapsed=' + elapsed + '&data=' + JSON.stringify(jsonJawaban),
-                    success: function (response) {
+                    success: function(response) {
                         $('.konten-soal-jawab').html('');
                         dialogWaktu();
                     },
-                    error: function (xhr, error, status) {
+                    error: function(xhr, error, status) {
                         console.log(xhr.responseText);
                     }
                 });
@@ -683,14 +694,15 @@
     }
 
     function submitJawaban(opsi) {
-        var jawaban_Siswa = '', jawaban_Alias = '';
+        var jawaban_Siswa = '',
+            jawaban_Alias = '';
         if (jenisSoal == 1) {
             jawaban_Siswa = $(opsi).data('jawabansiswa');
             jawaban_Alias = $(opsi).data('jawabanalias');
         } else if (jenisSoal == 2) {
             var isChecked = $('#konten-jawaban').find("input:checked");
             var max = $(opsi).data('max');
-            console.log('max:'+max, 'checked:'+isChecked.length);
+            console.log('max:' + max, 'checked:' + isChecked.length);
             if (isChecked.length > max) {
                 $(opsi).prop('checked', !$(opsi).prop('checked'));
                 $.toast({
@@ -704,7 +716,7 @@
                 return;
             } else {
                 var selected = [];
-                $('#konten-jawaban input:checked').each(function () {
+                $('#konten-jawaban input:checked').each(function() {
                     selected.push($(this).val());
                 });
                 jawaban_Siswa = selected;
@@ -737,29 +749,29 @@
         var bank = $('#up').find('input[name="bank"]').val();
 
         var item = {};
-        item ["no_soal_alias"] = nomorSoal;
-        item ["jawaban_alias"] = jawab_Alias;
-        item ["jawaban_siswa"] = jawab_Siswa;
-        item ["jenis"] = jenisSoal;
-        item ["id_soal"] = idSoal;
-        item ["id_soal_siswa"] = idSoalSiswa;
-        item ["id_jadwal"] = jadwal;
-        item ["id_bank"] = bank;
-        item ["id_siswa"] = siswa;
+        item["no_soal_alias"] = nomorSoal;
+        item["jawaban_alias"] = jawab_Alias;
+        item["jawaban_siswa"] = jawab_Siswa;
+        item["jenis"] = jenisSoal;
+        item["id_soal"] = idSoal;
+        item["id_soal_siswa"] = idSoalSiswa;
+        item["id_jadwal"] = jadwal;
+        item["id_bank"] = bank;
+        item["id_siswa"] = siswa;
 
         return item;
     }
 
     function getDataTable() {
-        var tbl = $('#table-jodohkan tr').get().map(function (row) {
+        var tbl = $('#table-jodohkan tr').get().map(function(row) {
             var $tables = [];
 
-            $(row).find('th').get().map(function (cell) {
+            $(row).find('th').get().map(function(cell) {
                 var klm = $(cell).text().trim();
                 $tables.push(klm == "" ? "#" : encode(klm));
             });
 
-            $(row).find('td').get().map(function (cell) {
+            $(row).find('td').get().map(function(cell) {
                 if ($(cell).children('input').length > 0) {
                     $tables.push($(cell).find('input').prop("checked") === true ? "1" : "0");
                 } else {
@@ -775,27 +787,27 @@
     function convertTable(data) {
         const head = []
         const body = []
-        $.each(data.tabel, function (idx, val) {
+        $.each(data.tabel, function(idx, val) {
             if (idx === 0) {
-                $.each(val, function (id, vl) {
+                $.each(val, function(id, vl) {
                     if (vl !== "#") head.push(encode(vl))
                 })
             } else {
-                $.each(val, function (id, vl) {
+                $.each(val, function(id, vl) {
                     if (id === 0) body.push(encode(vl))
                 })
             }
         })
         var kanan = data.thead;
         var kiri = [];
-        $.each(data.tbody, function (i, v) {
+        $.each(data.tbody, function(i, v) {
             kiri.push(encode(v.shift()));
         });
         kanan.shift();
 
         var linked = [];
-        $.each(data.tbody, function (n, arv) {
-            $.each(arv, function (t, v) {
+        $.each(data.tbody, function(n, arv) {
+            $.each(arv, function(t, v) {
                 if (v == '1') {
                     var it = {};
                     it['from'] = encode(body[n]);
@@ -815,18 +827,18 @@
         var kanan = data.thead;
         //console.log('kanan', kanan);
         var kiri = [];
-        $.each(data.tbody, function (i, v) {
+        $.each(data.tbody, function(i, v) {
             kiri.push(decode(v.shift()));
         });
         kanan.shift();
         //console.log('kiri', kiri);
-        $.each(kanan, function (i, v) {
+        $.each(kanan, function(i, v) {
             kanan[i] = (decode(v));
         });
 
         var linked = [];
-        $.each(data.tbody, function (n, arv) {
-            $.each(arv, function (t, v) {
+        $.each(data.tbody, function(n, arv) {
+            $.each(arv, function(t, v) {
                 if (v == '1') {
                     var it = {};
                     it['from'] = decode(kiri[n]);
@@ -846,10 +858,10 @@
     function getListData() {
         var kolom = [];
         var baris = [];
-        $(".FL-left li").each(function () {
+        $(".FL-left li").each(function() {
             baris.push(encode($(this).text()));
         });
-        $(".FL-right li").each(function () {
+        $(".FL-right li").each(function() {
             kolom.push(encode($(this).text()));
         });
         return [kolom, baris];
@@ -908,7 +920,7 @@
                         url: base_url + 'siswa/selesaiujian',
                         method: "POST",
                         data: $('#up').serialize(),
-                        success: function (respon) {
+                        success: function(respon) {
                             $('#next').removeAttr('disabled');
                             $('#loading').addClass('d-none');
                             //console.log(respon);
@@ -922,7 +934,7 @@
                                 });
                             }
                         },
-                        error: function (xhr, error, status) {
+                        error: function(xhr, error, status) {
                             console.log(xhr.responseText);
                             swal.fire({
                                 title: "Gagal",
@@ -1000,7 +1012,11 @@
         endTime.setMinutes(endTime.getMinutes() - startTime.getMinutes());
         endTime.setSeconds(endTime.getSeconds() - startTime.getSeconds());
 
-        return {h: endTime.getHours(), m: endTime.getMinutes(), s: endTime.getSeconds()}
+        return {
+            h: endTime.getHours(),
+            m: endTime.getMinutes(),
+            s: endTime.getSeconds()
+        }
     }
 
     function createTimerCountdown(durasi, elapsed, func) {
@@ -1083,7 +1099,78 @@
 
     document.addEventListener("visibilitychange", () => {
         if (document.hidden && infoJadwal.reset_login === '1') {
-            location.href=base_url+"siswa/leavecbt/<?= $jadwal->id_jadwal ?>/<?= $siswa->id_siswa ?>";
+            location.href = base_url + "siswa/leavecbt/<?= $jadwal->id_jadwal ?>/<?= $siswa->id_siswa ?>";
         }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const elem = document.documentElement;
+        let isFullscreen = false;
+        let isFullscreenTransitioning = false;
+        let initialHeight = window.innerHeight; // Simpan height awal
+
+        // Fungsi untuk membuka fullscreen
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Fungsi untuk mengecek apakah ukuran jendela mengecil dibandingkan dengan initialHeight
+        function checkWindowResize() {
+            const currentHeight = window.innerHeight;
+            if (currentHeight < initialHeight) {
+                alert("Jangan mengubah ukuran jendela selama ujian!");
+                location.href = base_url + "siswa/leavecbt/<?= $jadwal->id_jadwal ?>/<?= $siswa->id_siswa ?>";
+            }
+        }
+
+        // Mencegah resizing selama ujian hanya jika ukuran berkurang
+        window.addEventListener('resize', function() {
+            checkWindowResize();
+        });
+
+        // Cegah pergantian tab
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                alert("Anda tidak diperbolehkan membuka tab lain selama ujian berlangsung!");
+                location.href = base_url + "siswa/leavecbt/<?= $jadwal->id_jadwal ?>/<?= $siswa->id_siswa ?>";
+            }
+        });
+
+        // Mencegah klik kanan
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+            alert("Klik kanan tidak diperbolehkan!");
+        });
+
+        // Mencegah tombol shortcut yang tidak diinginkan (F12, Ctrl+Shift+I, Ctrl+R, F5, Ctrl+Tab)
+        document.onkeydown = function(e) {
+            const forbiddenKeys = [123, 73, 116, 82, 9]; // F12, Ctrl+Shift+I, F5, Ctrl+R, Ctrl+Tab
+            if ((e.ctrlKey && forbiddenKeys.includes(e.keyCode)) || e.keyCode === 123) {
+                alert("Aksi ini tidak diperbolehkan selama ujian!");
+                return false;
+            }
+        };
+
+        // Cegah keluar dari mode fullscreen
+        document.addEventListener('fullscreenchange', function() {
+            isFullscreenTransitioning = true;
+            if (!document.fullscreenElement) {
+                alert("Anda harus tetap dalam mode layar penuh selama ujian berlangsung!");
+                openFullscreen();
+            }
+            isFullscreen = !!document.fullscreenElement;
+            isFullscreenTransitioning = false;
+        });
+
+        openFullscreen(); // Panggil fullscreen secara otomatis di awal
     });
 </script>

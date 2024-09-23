@@ -353,7 +353,7 @@ $ekstra_guru = $guru->ekstra_kelas == null ? [] : unserialize($guru->ekstra_kela
     var guru_id = '<?=$guru->id_guru?>';
     var kelas_id = '<?=$guru->id_kelas?>';
     var level_id = '<?=$guru->id_level?>';
-    var mapel_guru = '<?= json_encode(unserialize($guru->mapel_kelas)) ?>';
+    var mapel_guru = '<?= addslashes(json_encode(unserialize($guru->mapel_kelas))) ?>';
     var ekstra_guru = '<?= json_encode($ekstra_guru) ?>';
     var guru_before = JSON.parse('<?= str_replace("'", "\'", json_encode($guru2)) ?>');
 </script>

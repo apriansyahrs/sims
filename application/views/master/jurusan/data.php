@@ -54,8 +54,12 @@
                             foreach ($jurusans as $row) :
                                 $badges = '';
                                 foreach (explode(',', $row->mapel_peminatan) as $mid) {
-                                    if ($mid != '')
+                                    // if ($mid != '')
+                                    //     $badges .= '<div class="badge badge-btn badge-success mr-1">' . $jurusan_mapels[$row->id_jurusan][$mid] . '</div>';
+                                    if ($mid != '' && isset($jurusan_mapels[$row->id_jurusan][$mid])) {
+                                        // Hanya tampilkan badge jika mapel_peminatan ditemukan
                                         $badges .= '<div class="badge badge-btn badge-success mr-1">' . $jurusan_mapels[$row->id_jurusan][$mid] . '</div>';
+                                    }
                                 }
                                 ?>
                                 <tr>

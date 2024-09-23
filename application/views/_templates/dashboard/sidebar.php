@@ -36,7 +36,7 @@
                 $infoelearning = ["kelascetak", "kelasstatus", "kelasabsensiharian", "kelasabsensiharianmapel", "kelasabsensibulanan", "kelasnilai", "kelascatatan"];
                 $cbt = ["cbtjenis", "cbtruang", "cbtsesi", "cbtsesisiswa", "cbtnomorpeserta", "cbtjadwal", "cbtbanksoal", "cbtalokasi", "cbtpengawas", "cbttoken"];
                 $infoujian = ["cbtcetak", "cbtpeserta", "cbtstatus", "cbtnilai", "cbtanalisis", "cbtrekap"];
-                $usermanager = ["useradmin", "userguru", "usersiswa"];
+                $usermanager = ["useradmin", "userguru", "usersiswa", "userorangtua"];
                 $databases = ["dbmanager", "dbclear", "update"];
                 $users = ["users"];
                 ?>
@@ -360,6 +360,12 @@
                             <a href="<?= base_url('usersiswa') ?>" class="nav-link <?= $page === 'usersiswa' ? "active" : "" ?>">
                                 <i class="fas fa-users nav-icon"></i>
                                 <p>Siswa</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= base_url('userorangtua') ?>" class="nav-link <?= $page === 'userorangtua' ? "active" : "" ?>">
+                                <i class="fas fa-users nav-icon"></i>
+                                <p>Orang Tua</p>
                             </a>
                         </li>
                     </ul>
