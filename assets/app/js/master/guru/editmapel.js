@@ -48,6 +48,7 @@ function submitajax(url, data, msg, btn) {
 
 function createDropdownKelasMapel() {
 	mapelGuru = JSON.parse(mapel_guru);
+	console.log(mapel_guru)
 
 	var inputgroup = $('#input-mapel');
 

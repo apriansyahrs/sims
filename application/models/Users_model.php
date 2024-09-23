@@ -319,45 +319,64 @@ class Users_model extends CI_Model
 
     public function getOrangtuaAktif($ids_orangtua = null)
     {
-        // Query untuk Ayah
-        $queryAyah = $this->db->select('id_siswa, nama AS nama_siswa, nama_ayah AS nama_orang_tua, nohp_ayah AS username, "Ayah" AS status_keluarga, 
-                                    (SELECT COUNT(id) FROM users WHERE users.username = nohp_ayah) AS aktif')
-            ->from('master_siswa')
-            ->where('nama_ayah IS NOT NULL AND nama_ayah != ""');
-
-        if ($ids_orangtua != null) {
-            $queryAyah->where_in('id_siswa', $ids_orangtua);
+        // Query untuk Ayah dengan JOIN ke tabel users
+        $this->db->select('a.id_siswa, a.nama AS nama_siswa, a.nama_ayah AS nama_orang_tua, a.nohp_ayah AS username, "Ayah" AS status_keluarga, 
+                           c.id, (SELECT COUNT(id) FROM users WHERE users.username = a.nohp_ayah) AS aktif')
+            ->from('master_siswa a')
+            ->join('users c', 'a.nohp_ayah = c.username', 'left')  // Join tabel users berdasarkan nohp_ayah
+            ->where('a.nama_ayah IS NOT NULL AND a.nama_ayah != ""')
+            ->where('a.nohp_ayah IS NOT NULL AND a.nohp_ayah != ""');
+        
+        // Jika ada parameter ids_orangtua, filter data menggunakan where_in
+        if ($ids_orangtua != null && is_array($ids_orangtua)) {
+            $this->db->where_in('a.id_siswa', $ids_orangtua);
         }
-        $queryAyah = $queryAyah->get_compiled_select();
-
-        // Query untuk Ibu
-        $queryIbu = $this->db->select('id_siswa, nama AS nama_siswa, nama_ibu AS nama_orang_tua, nohp_ibu AS username, "Ibu" AS status_keluarga, 
-                                   (SELECT COUNT(id) FROM users WHERE users.username = nohp_ibu) AS aktif')
-            ->from('master_siswa')
-            ->where('nama_ibu IS NOT NULL AND nama_ibu != ""');
-
-        if ($ids_orangtua != null) {
-            $queryIbu->where_in('id_siswa', $ids_orangtua);
+        
+        $queryAyah = $this->db->get_compiled_select();  // Ambil query compiled (tanpa eksekusi)
+    
+        // Query untuk Ibu dengan JOIN ke tabel users
+        $this->db->select('a.id_siswa, a.nama AS nama_siswa, a.nama_ibu AS nama_orang_tua, a.nohp_ibu AS username, "Ibu" AS status_keluarga, 
+                           c.id, (SELECT COUNT(id) FROM users WHERE users.username = a.nohp_ibu) AS aktif')
+            ->from('master_siswa a')
+            ->join('users c', 'a.nohp_ibu = c.username', 'left')  // Join tabel users berdasarkan nohp_ibu
+            ->where('a.nama_ibu IS NOT NULL AND a.nama_ibu != ""')
+            ->where('a.nohp_ibu IS NOT NULL AND a.nohp_ibu != ""');
+        
+        // Jika ada parameter ids_orangtua, filter data menggunakan where_in
+        if ($ids_orangtua != null && is_array($ids_orangtua)) {
+            $this->db->where_in('a.id_siswa', $ids_orangtua);
         }
-        $queryIbu = $queryIbu->get_compiled_select();
-
-        // Query untuk Wali
-        $queryWali = $this->db->select('id_siswa, nama AS nama_siswa, nama_wali AS nama_orang_tua, nohp_wali AS username, "Wali" AS status_keluarga, 
-                                    (SELECT COUNT(id) FROM users WHERE users.username = nohp_wali) AS aktif')
-            ->from('master_siswa')
-            ->where('nama_wali IS NOT NULL AND nama_wali != ""');
-
-        if ($ids_orangtua != null) {
-            $queryWali->where_in('id_siswa', $ids_orangtua);
+    
+        $queryIbu = $this->db->get_compiled_select();  // Ambil query compiled (tanpa eksekusi)
+    
+        // Query untuk Wali dengan JOIN ke tabel users
+        $this->db->select('a.id_siswa, a.nama AS nama_siswa, a.nama_wali AS nama_orang_tua, a.nohp_wali AS username, "Wali" AS status_keluarga, 
+                           c.id, (SELECT COUNT(id) FROM users WHERE users.username = a.nohp_wali) AS aktif')
+            ->from('master_siswa a')
+            ->join('users c', 'a.nohp_wali = c.username', 'left')  // Join tabel users berdasarkan nohp_wali
+            ->where('a.nama_wali IS NOT NULL AND a.nama_wali != ""')
+            ->where('a.nohp_wali IS NOT NULL AND a.nohp_wali != ""');
+        
+        // Jika ada parameter ids_orangtua, filter data menggunakan where_in
+        if ($ids_orangtua != null && is_array($ids_orangtua)) {
+            $this->db->where_in('a.id_siswa', $ids_orangtua);
         }
-        $queryWali = $queryWali->get_compiled_select();
-
+    
+        $queryWali = $this->db->get_compiled_select();  // Ambil query compiled (tanpa eksekusi)
+    
         // Gabungkan ketiga query menggunakan UNION ALL
         $finalQuery = "($queryAyah) UNION ALL ($queryIbu) UNION ALL ($queryWali)";
-
+        
         // Eksekusi query akhir
         $this->db->from("($finalQuery) as orangtua");
-
-        return $this->db->get()->result();
+    
+        // Debugging query untuk memastikan query benar
+        log_message('debug', 'Final Query: ' . $finalQuery);
+        
+        // Eksekusi dan kembalikan hasil
+        $results = $this->db->get()->result();
+        log_message('debug', 'Hasil Query Orang Tua Aktif: ' . json_encode($results));
+    
+        return $results;
     }
 }

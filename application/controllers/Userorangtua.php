@@ -1,21 +1,15 @@
 <?php
-/*   ________________________________________
-    |                 GarudaCBT              |
-    |    https://github.com/garudacbt/cbt    |
-    |________________________________________|
-*/
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Userorangtua extends CI_Controller
 {
-
     public function __construct()
     {
         parent::__construct();
         if (!$this->ion_auth->logged_in()) {
             redirect('auth');
         }
-        $this->load->library(['datatables', 'form_validation']); // Load Library Ignited-Datatables
+        $this->load->library(['datatables', 'form_validation']);
         $this->load->model('Users_model', 'users');
         $this->load->model('Master_model', 'master');
         $this->load->model('Dashboard_model', 'dashboard');
@@ -45,7 +39,7 @@ class Userorangtua extends CI_Controller
         $data = [
             'user' => $user,
             'judul'    => 'User Management',
-            'subjudul' => 'Data User Siswa',
+            'subjudul' => 'Data Orang Tua Siswa',
             'profile'        => $this->dashboard->getProfileAdmin($user->id),
             'setting'        => $this->dashboard->getSetting()
         ];
@@ -65,8 +59,6 @@ class Userorangtua extends CI_Controller
         $page = $this->input->post('page', true);
         $limit = $this->input->post('limit', true);
         $search = $this->input->post('search', true);
-        //$sortBy = $this->input->post('sort', true);
-        //$sortOrder = $this->input->post('order', true);
 
         $offset = ($page - 1) * $limit;
         $tp = $this->dashboard->getTahunActive();
@@ -87,7 +79,6 @@ class Userorangtua extends CI_Controller
 
     private function registerOrangtua($username, $password, $email, $additional_data, $group)
     {
-        // Fungsi Ion Auth untuk register user baru
         $reg = $this->ion_auth->register($username, $password, $email, $additional_data, $group);
 
         $data['status'] = true;
@@ -98,85 +89,54 @@ class Userorangtua extends CI_Controller
         return $data;
     }
 
-
     private function aktifkan($orangtua, $status_keluarga)
     {
-        // Tentukan nama berdasarkan status keluarga (Ayah, Ibu, Wali)
-        if ($status_keluarga == 'Ayah') {
-            $nama = explode(' ', $orangtua->nama_ayah);
-        } elseif ($status_keluarga == 'Ibu') {
-            $nama = explode(' ', $orangtua->nama_ibu);
-        } elseif ($status_keluarga == 'Wali') {
-            $nama = explode(' ', $orangtua->nama_wali);
+        // Tentukan nama dan nomor HP berdasarkan status keluarga
+        if (!empty($orangtua->username) && !empty($orangtua->nama_orang_tua)) {
+            $nama = explode(' ', $orangtua->nama_orang_tua);
+            $username = trim($orangtua->username);
+            $password = $orangtua->username;
+        } else {
+            return ['status' => false, 'msg' => 'Nama atau nomor HP orang tua tidak ditemukan atau kosong'];
         }
-
-        // Ambil first_name dan last_name
-        $first_name = $nama[0] ?? ''; // Nama depan
-        $last_name = isset($nama[1]) ? implode(' ', array_slice($nama, 1)) : ''; // Nama belakang jika ada lebih dari satu kata
-
-        // Tentukan username dan password berdasarkan nomor HP
-        $username = '';
-        $password = ''; // Username dan password berdasarkan nomor HP
-
-        if ($status_keluarga == 'Ayah') {
-            $username = trim($orangtua->nohp_ayah);
-            $password = $orangtua->nohp_ayah; // Password juga menggunakan nomor HP
-        } elseif ($status_keluarga == 'Ibu') {
-            $username = trim($orangtua->nohp_ibu);
-            $password = $orangtua->nohp_ibu; // Password juga menggunakan nomor HP
-        } elseif ($status_keluarga == 'Wali') {
-            $username = trim($orangtua->nohp_wali);
-            $password = $orangtua->nohp_wali; // Password juga menggunakan nomor HP
-        }
-
-        // Data tambahan untuk user orang tua
+    
+        // Split the name into first name and last name
+        $first_name = $nama[0] ?? '';
+        $last_name = isset($nama[1]) ? implode(' ', array_slice($nama, 1)) : '';
         $additional_data = [
             'first_name' => $first_name,
             'last_name'  => $last_name
         ];
-
-        // Grup ID untuk orang tua
-        $group = array('4'); // Grup 4 untuk orang tua
-
-        // Cek apakah user dengan email ini sudah ada
-        $email = $username . '@orangtua.com';  // Format email disesuaikan dari username
+    
+        $group = array('4'); // Group 4 for parents
+        $email = $username . '@orangtua.com';
+    
+        // Check if the user already exists, and delete it before reactivating
         $user_orangtua = $this->db->get_where('users', ['email' => $email])->row();
         $deleted = true;
-
-        // Jika sudah ada, hapus user sebelumnya
+    
         if ($user_orangtua != null) {
             $deleted = $this->ion_auth->delete_user($user_orangtua->id);
         }
-
-        // Jika user berhasil dihapus atau tidak ada user sebelumnya
+    
         if ($deleted) {
-            // Register user baru
             $reg = $this->registerOrangtua($username, $password, $email, $additional_data, $group);
-            $data = [
+            return [
                 'status' => $reg['status'],
-                'msg'    => !$reg['status'] ? 'Akun gagal diaktifkan.' : 'Akun diaktifkan.'
+                'msg'    => $reg['status'] ? 'Akun diaktifkan.' : 'Akun gagal diaktifkan.'
             ];
         } else {
-            $data = [
-                'status' => false,
-                'msg'    => 'Akun orang tua tidak tersedia (sudah digunakan).'
-            ];
+            return ['status' => false, 'msg' => 'Akun orang tua tidak dapat dihapus sebelumnya.'];
         }
-
-        return $data;
     }
-
-
-
+    
+   
     public function activate($unique_id)
     {
-        // Pisahkan id_siswa dan status keluarga (Ayah, Ibu, Wali) dari unique_id
         list($id_siswa, $status_keluarga) = explode('_', $unique_id);
 
-        // Ambil data siswa berdasarkan id_siswa
         $siswa = $this->users->getDataOrangtuaSiswa($id_siswa);
 
-        // Pastikan siswa ditemukan
         if (!$siswa) {
             $data = [
                 'status' => false,
@@ -186,53 +146,56 @@ class Userorangtua extends CI_Controller
             return;
         }
 
-        // Panggil fungsi untuk aktivasi akun orang tua berdasarkan status_keluarga
         $data = $this->aktifkan($siswa, $status_keluarga);
-
-        // Kembalikan data dalam format JSON
         $this->output_json($data);
     }
-
 
     public function aktifkanSemua()
     {
         // Ambil data orang tua yang akan diaktifkan
         $orangtuaAktif = $this->users->getOrangtuaAktif();
+    
         $jum = 0;
         $errors = []; // Menyimpan daftar error, jika ada
-
-        foreach ($orangtuaAktif as $siswa) {
-            if ($siswa->aktif == 0) {
-                $result = $this->aktifkan($siswa, $siswa->status_keluarga); // Sesuaikan status keluarga
-                if (!$result['status']) {
-                    // Jika ada kesalahan, simpan error tetapi lanjutkan ke siswa berikutnya
-                    $errors[] = "Gagal mengaktifkan: " . $siswa->nama;
+    
+        foreach ($orangtuaAktif as $orangtua) {
+            try {
+                // Pastikan nomor HP ada dan belum aktif
+                if (!empty($orangtua->username) && intval($orangtua->aktif) === 0) {
+                    $result = $this->aktifkan($orangtua, $orangtua->status_keluarga);
+                    if (!$result['status']) {
+                        $errors[] = "Gagal mengaktifkan: " . $orangtua->nama_orang_tua . " (No HP: " . $orangtua->username . ") - Error: " . $result['msg'];
+                    } else {
+                        $jum += 1;
+                    }
                 } else {
-                    $jum += 1; // Hitung berapa orang tua yang berhasil diaktifkan
+                    $errors[] = "Data tidak valid atau sudah aktif untuk: " . $orangtua->nama_orang_tua;
+                    continue; // Lanjutkan ke loop berikutnya, tanpa menghentikan proses
                 }
+            } catch (Exception $e) {
+                // Tangani error yang terjadi
+                $errors[] = "Exception terjadi untuk: " . $orangtua->nama_orang_tua . " - " . $e->getMessage();
             }
         }
-
+    
+        // Output hasil, meskipun ada error
         if (count($errors) > 0) {
-            // Jika ada error, kirimkan pesan error, tetapi tetap kirimkan jumlah yang berhasil diaktifkan
             $data = [
                 'status' => false,
                 'jumlah' => $jum,
                 'msg'    => 'Terdapat kesalahan dalam mengaktifkan beberapa orang tua: ' . implode(', ', $errors)
             ];
         } else {
-            // Semua sukses
             $data = [
                 'status' => true,
                 'jumlah' => $jum,
                 'msg'    => $jum . ' orang tua diaktifkan.'
             ];
         }
-
+    
         $this->output_json($data);
     }
-
-
+    
 
     private function nonaktifkan($user, $nama)
     {
@@ -243,13 +206,17 @@ class Userorangtua extends CI_Controller
             ];
         }
 
+        // Coba hapus user
         $deleted = $this->ion_auth->delete_user($user->id);
+        if (!$deleted) {
+            error_log("Gagal menghapus user dengan ID: " . $user->id); // Logging
+        }
+
         return [
             'status' => $deleted,
-            'msg'    => $deleted ? 'Akun dinonaktifkan.' : 'Akun gagal dinonaktifkan.'
+            'msg'    => $deleted ? 'User ' . urldecode($nama) . ' berhasil dinonaktifkan.' : 'Gagal menonaktifkan ' . urldecode($nama)
         ];
     }
-
 
     public function deactivate($username, $nama)
     {
@@ -277,7 +244,6 @@ class Userorangtua extends CI_Controller
         $this->output_json($data, true);
     }
 
-
     public function reset_login($username, $nama)
     {
         if (!$this->ion_auth->logged_in() || !$this->ion_auth->is_admin()) {
@@ -289,7 +255,6 @@ class Userorangtua extends CI_Controller
             return;
         }
 
-        // Hapus login attempts berdasarkan username
         $this->db->where('login', $username);
         if ($this->db->delete('login_attempts')) {
             $data = [
@@ -306,28 +271,34 @@ class Userorangtua extends CI_Controller
         $this->output_json($data, true);
     }
 
-
     public function nonaktifkanSemua()
     {
-        // Ambil data orang tua yang akan dinonaktifkan
+        // Ambil data orang tua yang aktif
         $orangtuaAktif = $this->users->getOrangtuaAktif();
         $jum = 0;
-        $errors = []; // Menyimpan daftar error, jika ada
+        $errors = []; // Menyimpan daftar error
 
         foreach ($orangtuaAktif as $orangtua) {
             if ($orangtua->aktif > 0) {
-                $del = $this->nonaktifkan($orangtua, $orangtua->nama_orang_tua);
-                if (!$del['status']) {
-                    // Jika ada kesalahan, simpan error tetapi lanjutkan ke siswa berikutnya
-                    $errors[] = "Gagal menonaktifkan: " . $orangtua->nama_orang_tua;
+                // Ambil user berdasarkan username
+                $user = $this->users->getUsers($orangtua->username);
+
+                if ($user) {
+                    // Coba nonaktifkan (hapus) user
+                    $del = $this->nonaktifkan($user, $orangtua->nama_orang_tua);
+                    if ($del['status']) {
+                        $jum += 1; // Hitung berapa user yang berhasil dihapus
+                    } else {
+                        $errors[] = "Gagal nonaktifkan: " . $orangtua->nama_orang_tua . " (No HP: " . $orangtua->username . ")";
+                    }
                 } else {
-                    $jum += 1; // Hitung berapa orang tua yang berhasil dinonaktifkan
+                    $errors[] = "User tidak ditemukan untuk: " . $orangtua->nama_orang_tua;
                 }
             }
         }
 
         if (count($errors) > 0) {
-            // Jika ada error, kirimkan pesan error, tetapi tetap kirimkan jumlah yang berhasil dinonaktifkan
+            // Jika ada error, kirimkan pesan error
             $data = [
                 'status' => false,
                 'jumlah' => $jum,
@@ -345,8 +316,6 @@ class Userorangtua extends CI_Controller
         $this->output_json($data);
     }
 
-
-
     public function edit($id)
     {
         $tp = $this->dashboard->getTahunActive();
@@ -356,8 +325,8 @@ class Userorangtua extends CI_Controller
         $data = [
             'user'         => $user,
             'judul'        => 'User Management',
-            'subjudul'    => 'Edit Data User',
-            'setting'        => $this->dashboard->getSetting()
+            'subjudul'     => 'Edit Data User',
+            'setting'      => $this->dashboard->getSetting()
         ];
         $data['siswa'] = $siswa;
         $data['tp'] = $this->dashboard->getTahun();
@@ -390,29 +359,26 @@ class Userorangtua extends CI_Controller
         $this->form_validation->set_rules('old', 'Password Lama', 'required|numeric|trim|min_length[6]');
         $this->form_validation->set_rules('new', 'Password Baru', 'required|numeric|trim|min_length[6]');
 
-        /*
-        if($this->form_validation->run()===FALSE){
-            //$this->session->set_flashdata('editsiswa', '<div id="flashdata" class="alert alert-default-danger align-content-center" role="alert"> test </div>');
-            //redirect('UserOrangtua/edit/'.$id_siswa);
+        // Jika validasi gagal
+        if ($this->form_validation->run() === FALSE) {
+            // Kembalikan ke halaman edit dengan error
         } else {
             $insert = [
                 "username"      => $username,
-                "password"      => $this->input->post('password', true)];
+                "password"      => $this->input->post('password', true)
+            ];
 
             $data['insert'] = $this->master->create('master_siswa', $insert);
             $data['text'] = 'Siswa berhasil ditambahkan';
-            $this->session->set_flashdata('editsiswa', '<div id="flashdata" class="alert alert-default-danger align-content-center" role="alert"> test </div>');
-            redirect('UserOrangtua/edit/'.$id_siswa);
+            redirect('UserOrangtua/edit/' . $id_siswa);
         }
-        */
-        //$this->output_json($siswa);
     }
 
     public function change_password()
     {
-        $this->form_validation->set_rules('old', $this->lang->line('change_password_validation_old_password_label'), 'required');
-        $this->form_validation->set_rules('new', $this->lang->line('change_password_validation_new_password_label'), 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|matches[new_confirm]');
-        $this->form_validation->set_rules('new_confirm', $this->lang->line('change_password_validation_new_password_confirm_label'), 'required');
+        $this->form_validation->set_rules('old', 'Old Password', 'required');
+        $this->form_validation->set_rules('new', 'New Password', 'required|min_length[6]|matches[new_confirm]');
+        $this->form_validation->set_rules('new_confirm', 'Confirm New Password', 'required');
 
         if ($this->form_validation->run() === FALSE) {
             $data = [
@@ -443,13 +409,5 @@ class Userorangtua extends CI_Controller
         $this->is_has_access();
         $data['status'] = $this->ion_auth->delete_user($id) ? true : false;
         $this->output_json($data);
-    }
-
-    private function hash_password($password)
-    {
-        if (empty($password) || strpos($password, "\0") !== FALSE || strlen($password) > 4096) {
-            return FALSE;
-        }
-        return password_hash($password, PASSWORD_BCRYPT);
     }
 }
